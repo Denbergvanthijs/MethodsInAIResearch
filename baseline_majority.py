@@ -1,7 +1,7 @@
 from typing import Counter
 
 
-class Baseline:
+class MajorityBaseline:
     def __init__(self, filepath_dataset: str):
         """A baseline model that always predicts the most common intent."""
         # Read the dataset from local folder
@@ -24,8 +24,8 @@ class Baseline:
 
 
 if __name__ == "__main__":
-    # Create a Baseline object
-    baseline = Baseline("./data/dialog_acts.dat")
+    # Create a MajorityBaseline object
+    baseline = MajorityBaseline("./data/dialog_acts.dat")
 
     # Predict the intent of an input sentence
     print(baseline.predict("I want to book a flight from London to Paris"))

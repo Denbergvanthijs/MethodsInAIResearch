@@ -1,4 +1,16 @@
 # MAIR-G8
 
-Table with the accuracy of each model.
+
+This project consists of the following baseline systems:
+
+- A baseline system that, regardless of the content of the utterance, always assigns the majority class of in the data. (baseline_majority.py)
+- A baseline rule-based system based on keyword matching. (baseline2.py)
+
+As well as three different machine learning classifiers:
+
+- kNN (knn.py)
+- Logistic regression (logreg.py)
+- Decision trees (lsvc.py)
+
+The table below shows the accuracy value of each of these models. 
 ![Accuracy](https://user-images.githubusercontent.com/113440512/190705271-9dd0c622-f359-4fe5-a8f8-ff54bd6ae8c9.png)

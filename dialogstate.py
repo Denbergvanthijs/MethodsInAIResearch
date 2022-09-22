@@ -6,7 +6,7 @@ from sklearn.linear_model import LogisticRegression
 
 
 class DialogState:
-    def __init__(self, fp_restaurant_info: str = "./data/restaurant_info.csv") -> None:
+    def __init__(self, fp_restaurant_info: str = "./data/restaurant_info.csv", fp_dialog_acts = "./data/dialog_acts.dat") -> None:
         self.history_utterances = []
         self.history_intents = [None]
         self.history_states = ["1"]
@@ -17,39 +17,39 @@ class DialogState:
                         "negate", "null", "repeat", "reqalts", "reqmore", "request", "restart", "thankyou"]
 
         self.area = ["north", "south", "west", "east", "centre"]
-        self.food = ['jamaican', 'chinese', 'cuban', 'portuguese', 'australasian', 'moroccan', 'traditional', 'international', 'seafood', 'steakhouse', 'japanese', 'gastropub', 'asian oriental', 'catalan', 'north american', 'polynesian', 'french', 'european', 'vietnamese', 'tuscan', 'romanian', 'swiss', 'thai', 'british', 'modern european', 'fusion', 'african', 'indian', 'turkish', 'italian', 'korean', 'lebanese', 'persian', 'mediterranean', 'bistro', 'spanish', 'indonesian']
+        self.food = ['jamaican', 'chinese', 'cuban', 'portuguese', 'australasian', 'moroccan', 'traditional',
+                    'international', 'seafood', 'steakhouse', 'japanese', 'gastropub', 'asian oriental', 'catalan',
+                    'north american', 'polynesian', 'french', 'european', 'vietnamese', 'tuscan', 'romanian', 'swiss',
+                    'thai', 'british', 'modern european', 'fusion', 'african', 'indian', 'turkish', 'italian', 'korean',
+                    'lebanese', 'persian', 'mediterranean', 'bistro', 'spanish', 'indonesian']
         self.pricerange = ["expensive", "cheap", "moderate"]
-        
+
         self.dontcare = ["any", "doesnt matter", 'dont care', 'dontcare']
         self.previous = {}
         self.restaurants = []
 
-        dialog_acts = pd.read_csv("./data/dialog_acts.dat", header=None, sep="\s\s+", engine="python")
-        dialog_acts["intent"] = dialog_acts[0].str.split(" ", 1).str[0]
-        dialog_acts[0] = dialog_acts[0].str.split(n=1).str[1]
-        dialog_acts.rename(columns={dialog_acts.columns[0]: "utterance"}, inplace=True)
+        with open(fp_dialog_acts) as file:
+            data = file.read().splitlines()  # Split the dataset into lines
 
-        X = dialog_acts["utterance"].values
-        y = dialog_acts["intent"].values
+        # Split each line into two parts: the intent and the utterance
+        # The 1 as the second argument means that we only split the line once
+        dataset = [row.split(" ", 1) for row in data]
+        y_data, x_data = zip(*dataset)
 
         self.vec = CountVectorizer()
-        self.vec.fit(X)
-        X_vec = self.vec.transform(X)
+        self.vec.fit(x_data)
+        X_vec = self.vec.transform(x_data)
 
         self.intent_model = LogisticRegression()
-        self.intent_model.fit(X_vec, y)
+        self.intent_model.fit(X_vec, y_data)
         self.restaurant_info = pd.read_csv(fp_restaurant_info)
-
 
     def act(self, user_utterance: str) -> None:
         """Determines the intent of current user utterance, fills slots and determines the next state of the dialog."""
         self.history_utterances.append(user_utterance)
-
         self.history_intents.append(self.classify_intent(user_utterance))
-
         self.fill_slots(user_utterance)
-
-        self.history_states.append(self.determine_next_state(user_utterance))
+        self.history_states.append(self.determine_next_state())
 
     def classify_intent(self, user_utterance: str) -> str:
         """Classifies the intent of the user utterance using a logistic regression model."""
@@ -57,26 +57,27 @@ class DialogState:
 
     def fill_slots(self, user_utterance: str) -> None:
         """Fills the slots with the information from the user utterance."""
-        slots, keys = {}, ["area", "food", "price"]
-        
-        for i in user_utterance.split():
+        slots = {}
+        keys = self.slots.keys()
+
+        for word in user_utterance.split():
             # Dont care --> Return slot based of previous computer message
             # next_word = s[s.index(i) + 1]
-            if i in self.dontcare and self.previous in keys:
+            if word in self.dontcare and self.previous in keys:
                 slots[self.previous] = "dontcare"
 
             # Return intent for area, price, food
-            elif i in self.area:
-                slots['area'] = i
-            elif i in self.pricerange:
-                slots['pricerange'] = i
-            elif i in self.food:
-                slots['food'] = i
-        
-        self.previous = slots
-        self.slots.update(slots)
+            elif word in self.area:
+                slots["area"] = word
+            elif word in self.pricerange:
+                slots["pricerange"] = word
+            elif word in self.food:
+                slots["food"] = word
 
-    def determine_next_state(self, user_utterance: str) -> str:
+        self.previous = slots  # Save the current slot for the next iteration
+        self.slots.update(slots)  # Update the user preferences based on the user's current utterance
+
+    def determine_next_state(self) -> str:
         """Determines the next state of the dialog based on the current state, filled slots and the intent of the current utterance."""
         if self.history_states[-1] in ("1", "2", "3.1"):
             if self.slots["area"] is None:
@@ -100,18 +101,20 @@ class DialogState:
             if self.history_intents[-1] == "bye":
                 return "8"
 
-        return "undefined"
+        return "undefined"  # This should never happen
 
     def lookup(self) -> List[str]:
         """Looks up all restaurants in the database that matches the user's preferences."""
-        query = "ilevel_0 in ilevel_0"
+        query_text = "ilevel_0 in ilevel_0"
 
         for key, value in self.slots.items():
             if value != "dontcare":
-                query += f" and {key} == '{value}'"
+                query_text += f" and {key} == '{value}'"
 
-        df_output = self.restaurant_info.query(query)
-        self.restaurants = [restaurant for restaurant in df_output['restaurantname']]
+        df_output = self.restaurant_info.query(query_text)
+
+        self.restaurants = df_output["restaurantname"].values
+        return self.restaurants
 
     def __str__(self) -> str:
         return f"slots={self.slots}; intent={self.intents[-1]}; state={self.states[-1]}; history_intents={self.history_intents}; history_states={self.history_states}; lookup={self.restaurants}"

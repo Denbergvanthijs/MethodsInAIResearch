@@ -1,5 +1,6 @@
 import os
 import pickle
+import random
 from typing import List
 
 import pandas as pd
@@ -56,8 +57,36 @@ class DialogState:
         """Determines the intent of current user utterance, fills slots and determines the next state of the dialog."""
         self.history_utterances.append(user_utterance)
         self.history_intents.append(self.classify_intent(user_utterance))
+
+        self.run_state()
+        print(user_utterance)
         self.fill_slots(user_utterance)
+
         self.history_states.append(self.determine_next_state())
+        print(f"intend={self.history_intents[-1]}; slots={self.slots}")
+    
+    def run_state(self) -> None:
+        """Runs the current state of the dialog."""
+        if self.history_states[-1] == "1":
+            print("1.  Welcome to the UU restaurant system! You can ask for restaurants by area, price range or food type. How may I help you?")
+        elif self.history_states[-1] == "2":
+            print("2. What part of town do you have in mind?")
+        elif self.history_states[-1] == "3":
+            print("3. What kind of food would you like?")
+        elif self.history_states[-1] == "3.1":
+            print(f"3.1. ")
+        elif self.history_states[-1] == "4":
+            print("4.  Would you like something in the cheap, moderate, or expensive price range?")
+        elif self.history_states[-1] == "5":
+            self.restaurant_chosen = random.choice(self.restaurants)
+            print(f"5. {self.restaurant_chosen} is a great restaurant in the {self.slots.get('area')}, it is a {self.slots.get('pricerange')} restaurant and it serves a {self.slots.get('food')} cuisine.")
+        elif self.history_states[-1] == "6":
+            print(f"6. I'm sorry but there is no {self.slots.get('pricerange')} place serving {self.slots.get('food')} cuisine in the {self.slots.get('area')}. What else can I help you with?")
+        elif self.history_states[-1] == "7":
+            print(f"7. Would you like the phone number, adress or postal code of {self.restaurant_chosen}?")
+        elif self.history_states[-1] == "8":
+            print(f"8. Goodbye and have a nice day!")
+
 
     def classify_intent(self, user_utterance: str) -> str:
         """Classifies the intent of the user utterance using a logistic regression model."""
@@ -130,12 +159,12 @@ class DialogState:
 
 if __name__ == "__main__":
     dialog_state = DialogState()
-    print(dialog_state)
+    # print(dialog_state)
     dialog_state.act("I'm looking for british food")
-    print(dialog_state)
+    # print(dialog_state)
     dialog_state.act("I'm looking for a restaurant in the centre")
-    print(dialog_state)
+    # print(dialog_state)
     dialog_state.act("Can I have a cheap restaurant")
-    print(dialog_state)
+    # print(dialog_state)
     dialog_state.act("Goodbye")
-    print(dialog_state)
+    # print(dialog_state)

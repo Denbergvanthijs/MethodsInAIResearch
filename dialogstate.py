@@ -1,4 +1,4 @@
-import random
+from typing import List
 
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
@@ -34,22 +34,26 @@ class DialogState:
         self.restaurant_info = pd.read_csv(fp_restaurant_info)
 
 
-    def next_state(self, user_utterance: str) -> str:
+    def act(self, user_utterance: str) -> None:
+        """Determines the intent of current user utterance, fills slots and determines the next state of the dialog."""
         self.history_utterances.append(user_utterance)
 
         self.history_intents.append(self.classify_intent(user_utterance))
 
         self.fill_slots(user_utterance)
 
-        self.history_states.append(self.classify_state(user_utterance))
+        self.history_states.append(self.determine_next_state(user_utterance))
 
     def classify_intent(self, user_utterance: str) -> str:
+        """Classifies the intent of the user utterance using a logistic regression model."""
         return self.intent_model.predict(self.vec.transform([user_utterance]))[0]
 
     def fill_slots(self, user_utterance: str) -> None:
+        """Fills the slots with the information from the user utterance."""
         return None
 
-    def classify_state(self, user_utterance: str) -> str:
+    def determine_next_state(self, user_utterance: str) -> str:
+        """Determines the next state of the dialog based on the current state, filled slots and the intent of the current utterance."""
         if self.history_states[-1] in ("1", "2", "3.1"):
             if self.slots["area"] is None:
                 return "2"
@@ -72,7 +76,8 @@ class DialogState:
             if self.history_intents[-1] == "bye":
                 return "8"
 
-    def lookup(self) -> str:
+    def lookup(self) -> List[str]:
+        """Looks up all restaurants in the database that matches the user's preferences."""
         query = "ilevel_0 in ilevel_0"
 
         for key, value in self.slots.items():
@@ -90,13 +95,13 @@ if __name__ == "__main__":
     dialog_state = DialogState()
     print(dialog_state)
     dialog_state.slots["food"] = "world"
-    dialog_state.next_state("I'm looking for world food")
+    dialog_state.act("I'm looking for world food")
     print(dialog_state)
     dialog_state.slots["area"] = "center"
-    dialog_state.next_state("I'm looking for a restaurant in the center")
+    dialog_state.act("I'm looking for a restaurant in the center")
     print(dialog_state)
     dialog_state.slots["pricerange"] = "expensive"
-    dialog_state.next_state("Can I have an expensive restaurant")
+    dialog_state.act("Can I have an expensive restaurant")
     print(dialog_state)
-    dialog_state.next_state("Goodbye")
+    dialog_state.act("Goodbye")
     print(dialog_state)

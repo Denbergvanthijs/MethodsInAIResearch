@@ -6,16 +6,16 @@ pref_dict = {"area": "centre", "pricerange": "expensive", "food": "british"}
 
 
 def lookup(dictionary):
-    string = "ilevel_0 in ilevel_0"
+    query = "ilevel_0 in ilevel_0"
 
-    for i in dictionary:
-        if dictionary[i] != "dontcare":
-            string += f" and {i} == '{dictionary[i]}'"
+    for key, value in dictionary.items():
+        if value != "dontcare":
+            query += f" and {key} == '{value}'"
 
-    df2 = df.query(string)
-    rest_list = [i for i in df2['restaurantname']]
+    df_output = df.query(query)
+    results = [restaurant for restaurant in df_output['restaurantname']]
 
-    return rest_list
+    return results
 
 
 restaurants = lookup(pref_dict)

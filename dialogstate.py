@@ -1,3 +1,5 @@
+import os
+import pickle
 from typing import List
 
 import pandas as pd
@@ -6,7 +8,7 @@ from sklearn.linear_model import LogisticRegression
 
 
 class DialogState:
-    def __init__(self, fp_restaurant_info: str = "./data/restaurant_info.csv", fp_dialog_acts = "./data/dialog_acts.dat") -> None:
+    def __init__(self, fp_restaurant_info: str = "./data/restaurant_info.csv", fp_dialog_acts = "./data/dialog_acts.dat", fp_pickle: str = "./data/logreg.pkl") -> None:
         self.history_utterances = []
         self.history_intents = [None]
         self.history_states = ["1"]
@@ -27,22 +29,28 @@ class DialogState:
         self.dontcare = ["any", "doesnt matter", 'dont care', 'dontcare']
         self.previous = {}
         self.restaurants = []
-
-        with open(fp_dialog_acts) as file:
-            data = file.read().splitlines()  # Split the dataset into lines
-
-        # Split each line into two parts: the intent and the utterance
-        # The 1 as the second argument means that we only split the line once
-        dataset = [row.split(" ", 1) for row in data]
-        y_data, x_data = zip(*dataset)
-
-        self.vec = CountVectorizer()
-        self.vec.fit(x_data)
-        X_vec = self.vec.transform(x_data)
-
-        self.intent_model = LogisticRegression()
-        self.intent_model.fit(X_vec, y_data)
         self.restaurant_info = pd.read_csv(fp_restaurant_info)
+
+        # Save the model to a pickle file to speedup the loading process
+        if not os.path.exists(fp_pickle):
+            with open(fp_dialog_acts) as file:
+                data = file.read().splitlines()  # Split the dataset into lines
+
+            # Split each line into two parts: the intent and the utterance
+            # The 1 as the second argument means that we only split the line once
+            dataset = [row.split(" ", 1) for row in data]
+            y_data, x_data = zip(*dataset)
+
+            self.vec = CountVectorizer()
+            self.vec.fit(x_data)
+            X_vec = self.vec.transform(x_data)
+
+            self.intent_model = LogisticRegression()
+            self.intent_model.fit(X_vec, y_data)
+
+            pickle.dump([self.vec, self.intent_model], open(fp_pickle, "wb"))
+        else:
+            self.vec, self.intent_model = pickle.load(open(fp_pickle, "rb"))
 
     def act(self, user_utterance: str) -> None:
         """Determines the intent of current user utterance, fills slots and determines the next state of the dialog."""

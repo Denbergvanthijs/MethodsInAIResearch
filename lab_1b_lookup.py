@@ -17,9 +17,10 @@ df.sample(5)
 pref_dict = {"area":'centre',"pricerange":'expensive',"food":'british'}
 
 def lookup(dictionary):
-  string = "area == '" + str(dictionary["area"]) + "'"
+  string = "ilevel_0 in ilevel_0"
   for i in dictionary:
-    string += " and " + str(i) + " == '" + str(dictionary[i]) + "'"
+    if dictionary[i] != "dontcare":
+      string += " and " + str(i) + " == '" + str(dictionary[i]) + "'"
   df2 = df.query(string)
   rest_list = [i for i in df2['restaurantname']]
   rest_rand = random.choice(rest_list)

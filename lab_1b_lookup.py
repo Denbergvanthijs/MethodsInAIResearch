@@ -7,12 +7,9 @@ Original file is located at
     https://colab.research.google.com/drive/1q9QAJxLFOyYXTAQWesxLi7Jb7-eUWbeb
 """
 
-import re
 import pandas as pd
-import random
 
 df = pd.read_csv("restaurant_info(1).csv")
-df.sample(5)
 
 pref_dict = {"area":'centre',"pricerange":'expensive',"food":'british'}
 
@@ -23,7 +20,6 @@ def lookup(dictionary):
       string += " and " + str(i) + " == '" + str(dictionary[i]) + "'"
   df2 = df.query(string)
   rest_list = [i for i in df2['restaurantname']]
-  rest_rand = random.choice(rest_list)
-  return (rest_rand)
+  return (rest_list)
 
 lookup(pref_dict)

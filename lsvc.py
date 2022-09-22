@@ -1,7 +1,7 @@
-from sklearn.metrics import accuracy_score
-from sklearn.svm import LinearSVC
-from sklearn.model_selection import train_test_split
 import spacy
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.svm import LinearSVC
 
 with open('dialog_acts.dat') as file:
     data = file.read().splitlines()  # Split the dataset into lines

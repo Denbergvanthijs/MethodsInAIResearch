@@ -1,6 +1,7 @@
+from collections import Counter
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from collections import Counter
 
 df = pd.read_csv('dialog_acts.dat',
             header=None, sep='\s\s+', engine='python')

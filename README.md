@@ -1,6 +1,5 @@
 # MAIR-G8
 
-
 This project consists of the following baseline systems:
 
 - A baseline system that, regardless of the content of the utterance, always assigns the majority class of in the data. (baseline_majority.py)
@@ -12,5 +11,16 @@ As well as three different machine learning classifiers:
 - Logistic regression (logreg.py)
 - Decision trees (lsvc.py)
 
-The table below shows the accuracy value of each of these models. 
+The table below shows the accuracy value of each of these models.
 ![Accuracy](https://user-images.githubusercontent.com/113440512/190705271-9dd0c622-f359-4fe5-a8f8-ff54bd6ae8c9.png)
+
+## Installation
+
+Place the required data files in the `./data/` folder.
+
+Install the following packages on Python 3.8+:
+
+```bash
+pip install pandas sklearn spacy
+python -m spacy download en_core_web_sm
+```

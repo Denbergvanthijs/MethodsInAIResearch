@@ -16,6 +16,13 @@ class DialogState:
         self.intents = ["ack", "affirm", "bye", "confirm", "deny", "hello", "inform",
                         "negate", "null", "repeat", "reqalts", "reqmore", "request", "restart", "thankyou"]
 
+        self.area = ["north", "south", "west", "east", "centre"]
+        self.food = ['jamaican', 'chinese', 'cuban', 'portuguese', 'australasian', 'moroccan', 'traditional', 'international', 'seafood', 'steakhouse', 'japanese', 'gastropub', 'asian oriental', 'catalan', 'north american', 'polynesian', 'french', 'european', 'vietnamese', 'tuscan', 'romanian', 'swiss', 'thai', 'british', 'modern european', 'fusion', 'african', 'indian', 'turkish', 'italian', 'korean', 'lebanese', 'persian', 'mediterranean', 'bistro', 'spanish', 'indonesian']
+        self.pricerange = ["expensive", "cheap", "moderate"]
+        
+        self.dontcare = ["any", "doesnt matter", 'dont care', 'dontcare']
+        self.previous = {}
+        self.restaurants = []
 
         dialog_acts = pd.read_csv("./data/dialog_acts.dat", header=None, sep="\s\s+", engine="python")
         dialog_acts["intent"] = dialog_acts[0].str.split(" ", 1).str[0]
@@ -50,7 +57,24 @@ class DialogState:
 
     def fill_slots(self, user_utterance: str) -> None:
         """Fills the slots with the information from the user utterance."""
-        return None
+        slots, keys = {}, ["area", "food", "price"]
+        
+        for i in user_utterance.split():
+            # Dont care --> Return slot based of previous computer message
+            # next_word = s[s.index(i) + 1]
+            if i in self.dontcare and self.previous in keys:
+                slots[self.previous] = "dontcare"
+
+            # Return intent for area, price, food
+            elif i in self.area:
+                slots['area'] = i
+            elif i in self.pricerange:
+                slots['pricerange'] = i
+            elif i in self.food:
+                slots['food'] = i
+        
+        self.previous = slots
+        self.slots.update(slots)
 
     def determine_next_state(self, user_utterance: str) -> str:
         """Determines the next state of the dialog based on the current state, filled slots and the intent of the current utterance."""
@@ -76,6 +100,8 @@ class DialogState:
             if self.history_intents[-1] == "bye":
                 return "8"
 
+        return "undefined"
+
     def lookup(self) -> List[str]:
         """Looks up all restaurants in the database that matches the user's preferences."""
         query = "ilevel_0 in ilevel_0"
@@ -85,23 +111,20 @@ class DialogState:
                 query += f" and {key} == '{value}'"
 
         df_output = self.restaurant_info.query(query)
-        return [restaurant for restaurant in df_output['restaurantname']]
+        self.restaurants = [restaurant for restaurant in df_output['restaurantname']]
 
     def __str__(self) -> str:
-        return f"slots={self.slots}; intent={self.intents[-1]}; state={self.states[-1]}; history_utterances={self.history_utterances}; history_intents={self.history_intents}; history_states={self.history_states}"
+        return f"slots={self.slots}; intent={self.intents[-1]}; state={self.states[-1]}; history_intents={self.history_intents}; history_states={self.history_states}; lookup={self.restaurants}"
 
 
 if __name__ == "__main__":
     dialog_state = DialogState()
     print(dialog_state)
-    dialog_state.slots["food"] = "world"
-    dialog_state.act("I'm looking for world food")
+    dialog_state.act("I'm looking for british food")
     print(dialog_state)
-    dialog_state.slots["area"] = "center"
-    dialog_state.act("I'm looking for a restaurant in the center")
+    dialog_state.act("I'm looking for a restaurant in the centre")
     print(dialog_state)
-    dialog_state.slots["pricerange"] = "expensive"
-    dialog_state.act("Can I have an expensive restaurant")
+    dialog_state.act("Can I have a cheap restaurant")
     print(dialog_state)
     dialog_state.act("Goodbye")
     print(dialog_state)

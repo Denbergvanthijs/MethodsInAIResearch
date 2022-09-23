@@ -2,6 +2,7 @@ import os
 import pickle
 import random
 from typing import List
+import Levenshtein as lev
 
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
@@ -95,24 +96,48 @@ class DialogState:
 
     def fill_slots(self, user_utterance: str) -> None:
         """Fills the slots with the information from the user utterance."""
-        new_slots = {}  # Dict with slots that will be updated at the end of this function
+        slots = {'area': None,
+                 'pricerange': None,
+                 'food': None
+                 }
+        slots_dist = {'area': 10,
+                      'pricerange': 10,
+                      'food': 10
+                      }
+        keys = self.slots.keys()
 
         for word in user_utterance.split():
-            # Dont care --> Return slot based of previous state
-            previous_state = self.history_states[-1]
-            if word in self.dontcare and previous_state in ["2", "3", "4"]:
-                new_slots[self.state_to_slot.get(previous_state)] = "dontcare"
+            # Dont care --> Return slot based of previous computer message
+            # next_word = s[s.index(i) + 1]
 
-            # Return intent for area, price, food
-            elif word in self.area:
-                new_slots["area"] = word
-            elif word in self.pricerange:
-                new_slots["pricerange"] = word
-            elif word in self.food:
-                new_slots["food"] = word
+            if word in self.dontcare and self.previous in keys:
+                slots[self.previous] = "dontcare"
+            else:
+                # Return intent for area, price, food
 
-        self.slots.update(new_slots)  # Update the user preferences based on the user's current utterance
+                # Find what category the word belongs to.
+                match_word, match_dist, match_category = self.recognize_keyword(word, 3)
+                # 3 is probably not the optimum error tolerance
+                # some errors will be tolerated, e.g. "for" and "north", "the" and "thai"
+                # but Levenshtein by itself is probably not enough
 
+                # Check if for that category, there's already a better match in the sentence.
+                if match_category == 'area':
+                    if not slots['area'] or slots_dist['area'] > match_dist:
+                        slots['area'] = match_word
+                        slots_dist['area'] = match_dist
+                elif match_category == 'pricerange':
+                    if not slots['pricerange'] or slots_dist['pricerange'] > match_dist:
+                        slots['pricerange'] = match_word
+                        slots_dist['pricerange'] = match_dist
+                elif match_category == 'food':
+                    if not slots['food'] or slots_dist['food'] > match_dist:
+                        slots['food'] = match_word
+                        slots_dist['food'] = match_dist
+
+        self.previous = slots  # Save the current slot for the next iteration
+        self.slots.update(slots)  # Update the user preferences based on the user's current utterance
+        
     def determine_next_state(self) -> str:
         """Determines the next state of the dialog based on the current state, filled slots and the intent of the current utterance."""
         if self.history_states[-1] in ("1", "2", "3.1"):
@@ -152,7 +177,35 @@ class DialogState:
 
         self.restaurants = df_output["restaurantname"].values
         return self.restaurants
+    
+    def recognize_keyword(self, key, max_err) -> str:
+        res = None
+        res_dist = 100
+        res_cat = None
 
+        for word in self.area:
+            dist = lev.distance(word, key)
+            if dist <= max_err and dist < res_dist:
+                res = word
+                res_dist = dist
+                res_cat = 'area'
+
+        for word in self.pricerange:
+            dist = lev.distance(word, key)
+            if dist <= max_err and dist < res_dist:
+                res = word
+                res_dist = dist
+                res_cat = 'pricerange'
+
+        for word in self.food:
+            dist = lev.distance(word, key)
+            if dist <= max_err and dist < res_dist:
+                res = word
+                res_dist = dist
+                res_cat = 'food'
+
+        return res, res_dist, res_cat
+    
     def __str__(self) -> str:
         return f"slots={self.slots}; intent={self.intents[-1]}; state={self.states[-1]}; history_intents={self.history_intents}; history_states={self.history_states}; lookup={self.restaurants}"
 

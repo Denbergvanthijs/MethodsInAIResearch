@@ -90,7 +90,8 @@ class DialogState:
         elif self.history_states[-1] == "3":
             print("3. What kind of food would you like?")
         elif self.history_states[-1] == "3.1":
-            print(f"3.1. ")
+            print(
+                f"3.1. There are no restaurants in the {self.slots['area']} area that serve {self.slots['food']}. What else can I help you with?")
         elif self.history_states[-1] == "4":
             print("4.  Would you like something in the cheap, moderate, or expensive price range?")
         elif self.history_states[-1] == "5":
@@ -158,13 +159,13 @@ class DialogState:
             if self.slots["food"] is None:
                 return "3"
             # If no restaurant in DB matches the user's preferences, go to state 3.1
-            if self.lookup() is None:
+            if not self.lookup():
                 return "3.1"
             if self.slots["pricerange"] is None:
                 return "4"
         if self.history_states[-1] in ("1", "2", "3.1", "3", "4"):
             # If no restaurant in DB matches the user's preferences, go to state 6
-            if self.lookup() is None:
+            if not self.lookup():
                 return "6"
             else:
                 return "5"
@@ -189,7 +190,7 @@ class DialogState:
 
         df_output = self.restaurant_info.query(query_text)
 
-        self.restaurants = df_output["restaurantname"].values
+        self.restaurants = df_output["restaurantname"].values.tolist()
         return self.restaurants
 
     def recognize_keyword(self, key: str) -> str:
@@ -215,12 +216,9 @@ class DialogState:
 if __name__ == "__main__":
     dialog_state = DialogState()
     # print(dialog_state)
-    dialog_state.act("I'm looking for a cheap brimish food")
+    dialog_state.act("I'm looking for a cheap brimish food in the north of town")
     # print(dialog_state)
     dialog_state.act("I'm looking for a restaurant in the centre")
-    # print(dialog_state)
-    # dialog_state.act("Can I have a cheap restaurant")
-    dialog_state.act("dontcare")
     # print(dialog_state)
     dialog_state.act("Goodbye")
     # print(dialog_state)

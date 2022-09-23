@@ -24,3 +24,11 @@ Install the following packages on Python 3.8+:
 pip install pandas sklearn spacy
 python -m spacy download en_core_web_sm
 ```
+
+## Development
+
+Install the following for the correct linter and formatter:
+
+```bash
+pip install autopep8 flake8 flake8-import-order flake8-blind-except flake8-builtins flake8-docstrings flake8-rst-docstrings flake8-logging-format
+```

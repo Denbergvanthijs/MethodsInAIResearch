@@ -9,7 +9,7 @@ from sklearn.linear_model import LogisticRegression
 
 
 class DialogState:
-    def __init__(self, fp_restaurant_info: str = "./data/restaurant_info.csv", fp_dialog_acts = "./data/dialog_acts.dat", fp_pickle: str = "./data/logreg.pkl") -> None:
+    def __init__(self, fp_restaurant_info: str = "./data/restaurant_info.csv", fp_dialog_acts: str = "./data/dialog_acts.dat", fp_pickle: str = "./data/logreg.pkl") -> None:
         self.history_utterances = []
         self.history_intents = [None]
         self.history_states = ["1"]
@@ -21,14 +21,14 @@ class DialogState:
 
         self.area = ["north", "south", "west", "east", "centre"]
         self.food = ['jamaican', 'chinese', 'cuban', 'portuguese', 'australasian', 'moroccan', 'traditional',
-                    'international', 'seafood', 'steakhouse', 'japanese', 'gastropub', 'asian oriental', 'catalan',
-                    'north american', 'polynesian', 'french', 'european', 'vietnamese', 'tuscan', 'romanian', 'swiss',
-                    'thai', 'british', 'modern european', 'fusion', 'african', 'indian', 'turkish', 'italian', 'korean',
-                    'lebanese', 'persian', 'mediterranean', 'bistro', 'spanish', 'indonesian']
+                     'international', 'seafood', 'steakhouse', 'japanese', 'gastropub', 'asian oriental', 'catalan',
+                     'north american', 'polynesian', 'french', 'european', 'vietnamese', 'tuscan', 'romanian', 'swiss',
+                     'thai', 'british', 'modern european', 'fusion', 'african', 'indian', 'turkish', 'italian', 'korean',
+                     'lebanese', 'persian', 'mediterranean', 'bistro', 'spanish', 'indonesian']
         self.pricerange = ["expensive", "cheap", "moderate"]
 
         self.dontcare = ["any", "doesnt matter", 'dont care', 'dontcare']
-        self.previous = {}
+        self.state_to_slot = {"2": "area", "3": "food", "4": "pricerange"}
         self.restaurants = []
         self.restaurant_info = pd.read_csv(fp_restaurant_info)
 
@@ -64,7 +64,7 @@ class DialogState:
 
         self.history_states.append(self.determine_next_state())
         print(f"intend={self.history_intents[-1]}; slots={self.slots}")
-    
+
     def run_state(self) -> None:
         """Runs the current state of the dialog."""
         if self.history_states[-1] == "1":
@@ -81,12 +81,13 @@ class DialogState:
             self.restaurant_chosen = random.choice(self.restaurants)
             print(f"5. {self.restaurant_chosen} is a great restaurant in the {self.slots.get('area')}, it is a {self.slots.get('pricerange')} restaurant and it serves a {self.slots.get('food')} cuisine.")
         elif self.history_states[-1] == "6":
-            print(f"6. I'm sorry but there is no {self.slots.get('pricerange')} place serving {self.slots.get('food')} cuisine in the {self.slots.get('area')}. What else can I help you with?")
+            print(
+                f"6. I'm sorry but there is no {self.slots.get('pricerange')} place serving {self.slots.get('food')} cuisine in the {self.slots.get('area')}. What else can I help you with?")
         elif self.history_states[-1] == "7":
             print(f"7. Would you like the phone number, adress or postal code of {self.restaurant_chosen}?")
         elif self.history_states[-1] == "8":
             print(f"8. Goodbye and have a nice day!")
-
+            exit()
 
     def classify_intent(self, user_utterance: str) -> str:
         """Classifies the intent of the user utterance using a logistic regression model."""
@@ -94,25 +95,23 @@ class DialogState:
 
     def fill_slots(self, user_utterance: str) -> None:
         """Fills the slots with the information from the user utterance."""
-        slots = {}
-        keys = self.slots.keys()
+        new_slots = {}  # Dict with slots that will be updated at the end of this function
 
         for word in user_utterance.split():
-            # Dont care --> Return slot based of previous computer message
-            # next_word = s[s.index(i) + 1]
-            if word in self.dontcare and self.previous in keys:
-                slots[self.previous] = "dontcare"
+            # Dont care --> Return slot based of previous state
+            previous_state = self.history_states[-1]
+            if word in self.dontcare and previous_state in ["2", "3", "4"]:
+                new_slots[self.state_to_slot.get(previous_state)] = "dontcare"
 
             # Return intent for area, price, food
             elif word in self.area:
-                slots["area"] = word
+                new_slots["area"] = word
             elif word in self.pricerange:
-                slots["pricerange"] = word
+                new_slots["pricerange"] = word
             elif word in self.food:
-                slots["food"] = word
+                new_slots["food"] = word
 
-        self.previous = slots  # Save the current slot for the next iteration
-        self.slots.update(slots)  # Update the user preferences based on the user's current utterance
+        self.slots.update(new_slots)  # Update the user preferences based on the user's current utterance
 
     def determine_next_state(self) -> str:
         """Determines the next state of the dialog based on the current state, filled slots and the intent of the current utterance."""
@@ -136,7 +135,8 @@ class DialogState:
             if self.history_intents[-1] == "request":
                 return "7"
             if self.history_intents[-1] == "bye":
-                return "8"
+                print(f"8. Goodbye and have a nice day!")
+                exit()
 
         return "undefined"  # This should never happen
 
@@ -164,7 +164,8 @@ if __name__ == "__main__":
     # print(dialog_state)
     dialog_state.act("I'm looking for a restaurant in the centre")
     # print(dialog_state)
-    dialog_state.act("Can I have a cheap restaurant")
+    # dialog_state.act("Can I have a cheap restaurant")
+    dialog_state.act("dontcare")
     # print(dialog_state)
     dialog_state.act("Goodbye")
     # print(dialog_state)

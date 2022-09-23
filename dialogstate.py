@@ -11,7 +11,7 @@ from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 
-nltk.download('stopwords')
+nltk.download("stopwords")
 
 
 class DialogState:
@@ -26,20 +26,20 @@ class DialogState:
                         "negate", "null", "repeat", "reqalts", "reqmore", "request", "restart", "thankyou")
 
         self.area = ("north", "south", "west", "east", "centre")
-        self.food = ('jamaican', 'chinese', 'cuban', 'portuguese', 'australasian', 'moroccan', 'traditional',
-                     'international', 'seafood', 'steakhouse', 'japanese', 'gastropub', 'asian oriental', 'catalan',
-                     'north american', 'polynesian', 'french', 'european', 'vietnamese', 'tuscan', 'romanian', 'swiss',
-                     'thai', 'british', 'modern european', 'fusion', 'african', 'indian', 'turkish', 'italian', 'korean',
-                     'lebanese', 'persian', 'mediterranean', 'bistro', 'spanish', 'indonesian')
+        self.food = ("jamaican", "chinese", "cuban", "portuguese", "australasian", "moroccan", "traditional",
+                     "international", "seafood", "steakhouse", "japanese", "gastropub", "asian oriental", "catalan",
+                     "north american", "polynesian", "french", "european", "vietnamese", "tuscan", "romanian", "swiss",
+                     "thai", "british", "modern european", "fusion", "african", "indian", "turkish", "italian", "korean",
+                     "lebanese", "persian", "mediterranean", "bistro", "spanish", "indonesian")
         self.pricerange = ("expensive", "cheap", "moderate")
-        self.dontcare = ("any", "doesnt matter", 'dont care', 'dontcare')
+        self.dontcare = ("any", "doesnt matter", "dont care", "dontcare")
 
         self.state_to_slot = {"2": "area", "3": "food", "4": "pricerange"}
         self.restaurants = []
         self.restaurant_info = pd.read_csv(fp_restaurant_info)
 
         self.max_lev_distance = max_lev_distance
-        self.stopwords = stopwords.words('english')
+        self.stopwords = stopwords.words("english")
 
         # Save the model to a pickle file to speedup the loading process
         if not os.path.exists(fp_pickle):
@@ -116,9 +116,9 @@ class DialogState:
         slots_lev = {}  # Dict with slots that match the user utterance with a maximum Levenshtein distance
 
         # Dict indicating the Levenshtein distance for each slot
-        slots_dist = {'area': self.max_lev_distance + 1,
-                      'pricerange': self.max_lev_distance + 1,
-                      'food': self.max_lev_distance + 1
+        slots_dist = {"area": self.max_lev_distance + 1,
+                      "pricerange": self.max_lev_distance + 1,
+                      "food": self.max_lev_distance + 1
                       }
 
         for word in user_utterance.split():

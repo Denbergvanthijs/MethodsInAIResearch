@@ -18,7 +18,7 @@ The table below shows the accuracy value of each of these models.
 
 ## Dialog Management
 
-The Dialog Management System can be found in `dialogstate.py`. This file also contains test cases for all 16 provided examples. Please see the installation instructions to download the required PyPi packages.
+The Dialog Management System can be found in `dialogstate.py`. The user can have a conversation in the CLI with the system via this file. The file `dialogstate_tests.py` contains test cases for all 16 provided examples. Please see the installation instructions to download the required PyPi packages.
 
 ![MAIR Dialog System](./images/MAIR_task_1b.png)
 

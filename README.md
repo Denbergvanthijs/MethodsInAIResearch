@@ -1,18 +1,26 @@
 # MAIR-G8
 
-This project consists of the following baseline systems:
+## Intent detection
 
-- A baseline system that, regardless of the content of the utterance, always assigns the majority class of in the data. (baseline_majority.py)
-- A baseline rule-based system based on keyword matching. (baseline2.py)
+This project consists of the following baseline systems for intent detection:
 
-As well as three different machine learning classifiers:
+- A baseline system that, regardless of the content of the utterance, always assigns the majority class of in the data. (`baseline_majority.py`)
+- A baseline rule-based system based on keyword matching. (`baseline_keyword_matcher.py`)
 
-- kNN (knn.py)
-- Logistic regression (logreg.py)
-- Decision trees (lsvc.py)
+As well as three different machine learning classifiers for intent detection:
+
+- kNN (`knn.py`)
+- Logistic regression (`logreg.py`)
+- Linear SVC (`lsvc.py`)
 
 The table below shows the accuracy value of each of these models.
 ![Accuracy](https://user-images.githubusercontent.com/113440512/190705271-9dd0c622-f359-4fe5-a8f8-ff54bd6ae8c9.png)
+
+## Dialog Management
+
+The Dialog Management System can be found in `dialogstate.py`. This file also contains test cases for all 16 provided examples. Please see the installation instructions to download the required PyPi packages.
+
+![MAIR Dialog System](./images/MAIR_task_1b.png)
 
 ## Installation
 

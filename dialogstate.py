@@ -3,13 +3,14 @@ import pickle
 import random
 from typing import List
 
+import Levenshtein as lev
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 
 
 class DialogState:
-    def __init__(self, fp_restaurant_info: str = "./data/restaurant_info.csv", fp_dialog_acts: str = "./data/dialog_acts.dat", fp_pickle: str = "./data/logreg.pkl") -> None:
+    def __init__(self, fp_restaurant_info: str = "./data/restaurant_info.csv", fp_dialog_acts: str = "./data/dialog_acts.dat", fp_pickle: str = "./data/logreg.pkl", max_lev_distance: int = 3) -> None:
         self.history_utterances = []
         self.history_intents = [None]
         self.history_states = ["1"]
@@ -31,6 +32,7 @@ class DialogState:
         self.state_to_slot = {"2": "area", "3": "food", "4": "pricerange"}
         self.restaurants = []
         self.restaurant_info = pd.read_csv(fp_restaurant_info)
+        self.max_lev_distance = max_lev_distance
 
         # Save the model to a pickle file to speedup the loading process
         if not os.path.exists(fp_pickle):
@@ -97,19 +99,39 @@ class DialogState:
         """Fills the slots with the information from the user utterance."""
         new_slots = {}  # Dict with slots that will be updated at the end of this function
 
+        # Dict indicating the Levenshtein distance for each slot
+        slots_dist = {'area': self.max_lev_distance + 1,
+                      'pricerange': self.max_lev_distance + 1,
+                      'food': self.max_lev_distance + 1
+                      }
+
         for word in user_utterance.split():
             # Dont care --> Return slot based of previous state
             previous_state = self.history_states[-1]
-            if word in self.dontcare and previous_state in ["2", "3", "4"]:
+
+            # If previous question was about area, pricerange or food
+            # Only then we can use the dontcare word
+            if word in self.dontcare and previous_state in ("2", "3", "4"):
                 new_slots[self.state_to_slot.get(previous_state)] = "dontcare"
 
-            # Return intent for area, price, food
-            elif word in self.area:
-                new_slots["area"] = word
-            elif word in self.pricerange:
-                new_slots["pricerange"] = word
-            elif word in self.food:
-                new_slots["food"] = word
+            # If direct match is found, set the slot to the found word
+            for category, category_name in zip((self.area, self.pricerange, self.food), ("area", "pricerange", "food")):
+                if word in category:
+                    new_slots[category_name] = word
+
+        # If strict keyword matching did not work, use Levenshtein distance
+        if not new_slots:
+            for word in user_utterance.split():
+                # Find what category the word belongs to
+                match_word, match_dist, match_category = self.recognize_keyword(word, self.max_lev_distance)
+                # Some errors will be tolerated, e.g. "for" and "north", "the" and "thai"
+                # But Levenshtein by itself is probably not enough
+
+                # Check if for that category, there's already a better match in the sentence.
+                # For each slot, we only want to keep the best match
+                if match_category and match_dist < slots_dist.get(match_category):
+                    slots_dist[match_category] = match_dist  # Make new distance smaller
+                    new_slots[match_category] = match_word  # Update the best match for that category
 
         self.slots.update(new_slots)  # Update the user preferences based on the user's current utterance
 
@@ -153,6 +175,22 @@ class DialogState:
         self.restaurants = df_output["restaurantname"].values
         return self.restaurants
 
+    def recognize_keyword(self, key, max_err) -> str:
+        """Recognizes the keyword that is closest to the key in terms of Levenshtein distance."""
+        res_word = None  # Resulting word
+        res_dist = self.max_lev_distance  # Resulting distance
+        res_cat = None  # Resulting category
+
+        for category, category_name in zip((self.area, self.pricerange, self.food), ("area", "pricerange", "food")):
+            for word in category:
+                dist = lev.distance(word, key)  # Levenshtein distance
+                if dist < res_dist:  # If the distance is smaller than the current best match
+                    res_word = word
+                    res_dist = dist
+                    res_cat = category_name
+
+        return res_word, res_dist, res_cat
+
     def __str__(self) -> str:
         return f"slots={self.slots}; intent={self.intents[-1]}; state={self.states[-1]}; history_intents={self.history_intents}; history_states={self.history_states}; lookup={self.restaurants}"
 
@@ -160,7 +198,7 @@ class DialogState:
 if __name__ == "__main__":
     dialog_state = DialogState()
     # print(dialog_state)
-    dialog_state.act("I'm looking for british food")
+    dialog_state.act("I'm looking for a brimish food")
     # print(dialog_state)
     dialog_state.act("I'm looking for a restaurant in the centre")
     # print(dialog_state)

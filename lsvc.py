@@ -3,7 +3,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.svm import LinearSVC
 
-with open('dialog_acts.dat') as file:
+with open("./data/dialog_acts.dat") as file:
     data = file.read().splitlines()  # Split the dataset into lines
 
 # Split each line into two parts: the intent and the utterance
@@ -13,7 +13,7 @@ y_data, x_data = zip(*dataset)
 
 # Convert texts to vectors
 
-nlp = spacy.load('en_core_web_sm')
+nlp = spacy.load("en_core_web_sm")
 docs = [nlp(sentence) for sentence in x_data]
 x_vectors = [doc.vector for doc in docs]
 

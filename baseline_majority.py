@@ -1,14 +1,14 @@
 from typing import Counter
 
 import pandas as pd
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import (accuracy_score, f1_score, precision_score,
+                             recall_score)
 from sklearn.model_selection import train_test_split
 
 
 def preprocess_data(filepath_dataset: str, test_size: float = 0.15, random_state: int = 42) -> tuple:
     """Preprocess the data."""
     with open(filepath_dataset) as file:
-
         data = file.read().splitlines()  # Split the dataset into lines
 
     # Split each line into two parts: the intent and the utterance
@@ -35,7 +35,20 @@ class MajorityBaseline:
 
     def evaluate(self, y_true: list) -> float:
         """Evaluate the model."""
-        return accuracy_score(y_true, [self.mode] * len(y_true))
+        scores = {}
+        y_pred = [self.mode] * len(y_true)
+        scores["accuracy"] = accuracy_score(y_true, y_pred)
+
+        scores["f1-macro"] = f1_score(y_true, y_pred, average='macro')
+        scores["f1-micro"] = f1_score(y_true, y_pred, average='micro')
+
+        scores["precision-macro"] = precision_score(y_true, y_pred, average='macro')
+        scores["precision-micro"] = precision_score(y_true, y_pred, average='micro')
+
+        scores["recall-micro"] = recall_score(y_true, y_pred, average='macro')
+        scores["recall-micro"] = recall_score(y_true, y_pred, average='micro')
+
+        return scores
 
 
 if __name__ == "__main__":
@@ -48,7 +61,8 @@ if __name__ == "__main__":
     results_train = model.evaluate(y_train)
     results_test = model.evaluate(y_test)
 
-    print(f"{results_train=}, {results_test=}")
+    print(f"{results_train=}")
+    print(f"{results_test=}")
 
     # Predict the intent of an input sentence
     prediction = model.predict("I want to book a flight from London to Paris")

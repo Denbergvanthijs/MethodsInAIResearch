@@ -32,3 +32,7 @@ Install the following for the correct linter and formatter:
 ```bash
 pip install autopep8 flake8 flake8-import-order flake8-blind-except flake8-builtins flake8-docstrings flake8-rst-docstrings flake8-logging-format
 ```
+
+## Limitations
+
+- Dontcares only work if said after states 2, 3, or 4. Preferably, the system automatically figures out to what slot dontcares belong to

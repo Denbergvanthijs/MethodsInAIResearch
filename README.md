@@ -9,9 +9,9 @@ This project consists of the following baseline systems for intent detection:
 
 As well as three different machine learning classifiers for intent detection:
 
-- kNN (`knn.py`)
-- Logistic regression (`logreg.py`)
-- Linear SVC (`lsvc.py`)
+- kNN (`ml_knn.py`)
+- Logistic regression (`ml_logreg.py`)
+- Linear SVC (`ml_lsvc.py`)
 
 The table below shows the accuracy value of each of these models.
 ![Accuracy](https://user-images.githubusercontent.com/113440512/190705271-9dd0c622-f359-4fe5-a8f8-ff54bd6ae8c9.png)

@@ -21,7 +21,7 @@ Place the required data files in the `./data/` folder.
 Install the following packages on Python 3.8+:
 
 ```bash
-pip install pandas sklearn spacy python-levenshtein
+pip install pandas sklearn spacy python-levenshtein nltk
 python -m spacy download en_core_web_sm
 ```
 

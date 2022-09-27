@@ -24,4 +24,4 @@ if __name__ == "__main__":
     # Add columns and add to empty csv file
     df = pd.read_csv("./data/restaurant_info.csv")
     df_plus = add_random_columns(df)
-    df_plus.to_csv("./restaurant_data.csv")
+    df_plus.to_csv("./data/restaurant_data.csv")

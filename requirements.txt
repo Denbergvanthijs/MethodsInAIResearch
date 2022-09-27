@@ -1,0 +1,8 @@
+pandas
+sklearn
+spacy
+python-levenshtein
+nltk
+python-dotenv
+gTTS
+playsound==1.2.2

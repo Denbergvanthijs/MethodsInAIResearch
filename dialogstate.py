@@ -6,6 +6,7 @@ from typing import List
 import Levenshtein as lev
 import nltk
 import pandas as pd
+from dotenv import dotenv_values
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import CountVectorizer
@@ -15,7 +16,7 @@ nltk.download("stopwords")
 
 
 class DialogState:
-    def __init__(self, fp_restaurant_info: str = "./data/restaurant_info.csv", fp_dialog_acts: str = "./data/dialog_acts.dat", fp_pickle: str = "./data/logreg.pkl", max_lev_distance: int = 3) -> None:
+    def __init__(self, fp_restaurant_info: str = "./data/restaurant_info.csv", fp_dialog_acts: str = "./data/dialog_acts.dat", fp_pickle: str = "./data/logreg.pkl", configurability: dict = {}) -> None:
         self.history_utterances = []
         self.history_states = ["1"]  # Start with state 1
         self.history_intents = [None]  # Start with no intent for state 1
@@ -38,8 +39,9 @@ class DialogState:
         self.restaurant_info = pd.read_csv(fp_restaurant_info)
         self.restaurants = []  # List of restaurants that match the current slots
 
-        self.max_lev_distance = max_lev_distance
         self.stopwords = stopwords.words("english")
+
+        self.configurability = configurability
 
         # Save the model to a pickle file to speedup the loading process
         if not os.path.exists(fp_pickle):
@@ -124,10 +126,9 @@ class DialogState:
         slots_lev = {}  # Dict with slots that match the user utterance with a maximum Levenshtein distance
 
         # Dict indicating the Levenshtein distance for each slot
-        slots_dist = {"area": self.max_lev_distance + 1,
-                      "pricerange": self.max_lev_distance + 1,
-                      "food": self.max_lev_distance + 1
-                      }
+        slots_dist = {"area": int(self.configurability.get("max_lev_distance", 3)) + 1,
+                      "pricerange": int(self.configurability.get("max_lev_distance", 3)) + 1,
+                      "food": int(self.configurability.get("max_lev_distance", 3)) + 1}
 
         for word in user_utterance.split():
             # Dont care --> Return slot based of most recent state
@@ -217,7 +218,7 @@ class DialogState:
     def recognize_keyword(self, key: str) -> str:
         """Recognizes the keyword that is closest to the key in terms of Levenshtein distance."""
         res_word = None  # Resulting word
-        res_dist = self.max_lev_distance  # Resulting distance
+        res_dist = int(self.configurability.get("max_lev_distance", 3))  # Resulting distance
         res_cat = None  # Resulting category
 
         for category, category_name in zip((self.area, self.pricerange, self.food), ("area", "pricerange", "food")):
@@ -235,11 +236,13 @@ class DialogState:
 
 
 if __name__ == "__main__":
-    # dialog_state = DialogState()
+    configurability = dotenv_values(".env")
+
+    # dialog_state = DialogState(configurability=configurability)
     # dialog_state.act("I'm looking for a cheap brimish food in the north of town")
     # dialog_state.act("I'm looking for a restaurant in the center")
     # dialog_state.act("Thank you very much!")
 
-    dialog_state = DialogState()
+    dialog_state = DialogState(configurability=configurability)
     while True:
         dialog_state.act()

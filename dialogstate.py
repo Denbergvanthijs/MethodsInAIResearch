@@ -160,6 +160,11 @@ class DialogState:
 
     def determine_next_state(self) -> str:
         """Determines the next state of the dialog based on the current state, filled slots and the intent of the current utterance."""
+        # Always be able to exit
+        if self.history_intents[-1] in ("bye"):
+            print(f"8. Goodbye and have a nice day!")
+            exit()
+
         if self.history_states[-1] in ("1", "2", "3.1"):
             if self.slots["area"] is None:
                 return "2"
@@ -230,11 +235,11 @@ class DialogState:
 
 
 if __name__ == "__main__":
-    dialog_state = DialogState()
-    dialog_state.act("I'm looking for a cheap brimish food in the north of town")
-    dialog_state.act("I'm looking for a restaurant in the center")
-    dialog_state.act("Thank you very much!")
-
     # dialog_state = DialogState()
-    # while True:
-    #     dialog_state.act()
+    # dialog_state.act("I'm looking for a cheap brimish food in the north of town")
+    # dialog_state.act("I'm looking for a restaurant in the center")
+    # dialog_state.act("Thank you very much!")
+
+    dialog_state = DialogState()
+    while True:
+        dialog_state.act()

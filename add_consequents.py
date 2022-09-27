@@ -34,9 +34,11 @@ def add_rules(dataframe):
   dataframe =dataframe.assign(touristic=t,child_friendly=c,romantic=r)
   return(dataframe)
 
-# Create csv
-df_add = add_rules(df)
-df_add.to_csv("/restaurant_data.csv")
+if __name__ == "__main__":
+    # Add consequents and add to restaurant_data csv file
+    df = pd.read_csv("./data/restaurant_data.csv")
+    df_add = add_rules(df)
+    df_add.to_csv("./data/restaurantdata.csv")
 
 # Check if there are romantic restaurants
 # df_add.loc[(df_add['romantic'] == True)]

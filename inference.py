@@ -23,32 +23,51 @@ def filter_based_on_preferences(restaurants, preferences: dict):
         querystr += " and lengthofstay == 'short'"
 
     res = restaurants.query(querystr)
-    names = res['restaurantname'].values.tolist()
+    return res
+
+
+def create_reasoning_sentence(preferences):
     reasonstr = ''
 
     if preferences['touristic']:  # touristic
-        reasonstr += f"{', and' if len(reasonstr) > 0 else ''} {'it serves' if len(names) == 1 else 'they serve'} quality food with affordable price"
+        reasonstr += f"{', and' if len(reasonstr) > 0 else ''} it serves quality food with affordable price"
     if preferences['romantic']:  # romantic
-        reasonstr += f"{', and' if len(reasonstr) > 0 else ''} {'it is' if len(names) == 1 else 'they are'} not too crowded and suitable for long stay"
+        reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the restaurant is not too crowded and suitable for long stay"
     if preferences['child']:  # child-friendly
-        reasonstr += f"{', and' if len(reasonstr) > 0 else ''} {'it is' if len(names) == 1 else 'they are'} good for a short visit"
+        reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the place is good for a short visit"
 
-    if len(names) > 0:
-        resultstr = ' and '.join(names)
-        resultstr += f" {'matches' if len(names) == 1 else 'match'} your preference because{reasonstr}."
-    else:
-        resultstr = "Sorry, we cannot find any place that match your preference."
+    reasonstr = 'The restaurant matches your preference because' + reasonstr
+    return f"{reasonstr}."
 
-    return res, resultstr
 
+in_tou = input("Would you like a touristic place? ").lower()
+in_rom = input("Is it for a romantic occassion? ").lower()
+in_chi = input("Does the place have to be child-friendly? ").lower()
 
 restos = pd.read_csv('./data/dummy_restaurants.csv')
-prefs = {
-    "touristic": True,
-    "romantic": False,
-    "child": True
-}
+prefs = {}
+prefs['touristic'] = True if in_tou == 'y' or in_tou == 'yes' else False
+prefs['romantic'] = True if in_rom == 'y' or in_rom == 'yes' else False
+prefs['child'] = True if in_chi == 'y' or in_chi == 'yes' else False
 
-filtered_restos, reason_string = filter_based_on_preferences(restos, prefs)
-print(filtered_restos)
-print(reason_string)
+restos = filter_based_on_preferences(restos, prefs).to_dict()
+reasoning = create_reasoning_sentence(prefs)
+
+print(restos)
+
+if len(restos['area']) < 1:
+    print("Sorry, we cannot find any place that match your preference.")
+else:
+    satisfied = False
+    for key, val in restos['restaurantname'].items():
+        print(f"I recommend { val }, it is a { restos['pricerange'][key] } { restos['food'][key] } restaurant in the { restos['area'][key] } of town.\n{ reasoning }")
+
+        response = input("Are you happy with this recommendation? ")
+        if response.lower() == 'y' or response.lower() == 'yes':
+            satisfied = True
+            break
+
+    if satisfied:
+        print("Thank you and goedendag!")
+    else:
+        print("Sorry, that is all the recommendations we have.")

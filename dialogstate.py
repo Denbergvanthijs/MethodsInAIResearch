@@ -92,28 +92,59 @@ class DialogState:
 
     def execute_state(self) -> None:
         """Runs the current state of the dialog."""
-        if self.history_states[-1] == "1":
+        if self.history_states[-1] == "1" and self.configurability.get("formal") == 'True':
             self.print_w_option("1.  Welcome to the UU restaurant system! You can ask for restaurants by area, price range or food type. How may I help you?", self.configurability.get("output_in_caps"))
-        elif self.history_states[-1] == "2":
+        elif self.history_states[-1] == "1" and self.configurability.get("formal") == 'False':
+            self.print_w_option("1. Yarr matey, I be recommending you the best taverns! Tell me your price range, area, and food wishes or I'll throw you off my ship!", self.configurability.get("output_in_caps"))
+        
+        elif self.history_states[-1] == "2" and self.configurability.get("formal") == 'True':
             self.print_w_option("2. What part of town do you have in mind? Choose from {north, south, east, west, centre}.", self.configurability.get("output_in_caps"))
-        elif self.history_states[-1] == "3":
+        elif self.history_states[-1] == "2" and self.configurability.get("formal") == 'False':
+            self.print_w_option("2. Look at your compass landlubber, be it pointing north, south, east or west?", self.configurability.get("output_in_caps"))
+        
+        elif self.history_states[-1] == "3" and self.configurability.get("formal") == 'True':
             self.print_w_option("3. What kind of food would you like? Choose any cuisine!", self.configurability.get("output_in_caps"))
-        elif self.history_states[-1] == "3.1":
+        elif self.history_states[-1] == "3" and self.configurability.get("formal") == 'False':
+            self.print_w_option("3. Yer don't want scurvy right? Pick a food!", self.configurability.get("output_in_caps"))
+        
+        elif self.history_states[-1] == "3.1" and self.configurability.get("formal") == 'True':
             self.print_w_option(f"3.1. There are no restaurants in the {self.slots['area']} area "
                   f"that serve {self.slots['food']}. What else can I help you with?", self.configurability.get("output_in_caps"))
-        elif self.history_states[-1] == "4":
+        elif self.history_states[-1] == "3.1" and self.configurability.get("formal") == 'False':
+            self.print_w_option(f"3.1. There no be taverns in the {self.slots['area']} area "
+                  f"that serve {self.slots['food']} loot. Any alternatives?", self.configurability.get("output_in_caps"))
+        
+        elif self.history_states[-1] == "4" and self.configurability.get("formal") == 'True':
             self.print_w_option("4.  Would you like the restaurant to be in the cheap, moderate, or expensive price range?", self.configurability.get("output_in_caps"))
-        elif self.history_states[-1] == "5":
+        elif self.history_states[-1] == "4" and self.configurability.get("formal") == 'False':
+            self.print_w_option("4.  I hope ye got some doubloons, pick a cheap, moderate or expensive tavern.", self.configurability.get("output_in_caps"))
+        
+        elif self.history_states[-1] == "5" and self.configurability.get("formal") == 'True':
             self.restaurant_chosen = random.choice(self.restaurants)
             self.print_w_option(f"5. {self.restaurant_chosen} is a great restaurant in the {self.slots.get('area')}, "
                   f"it is a {self.slots.get('pricerange')} restaurant and it serves a {self.slots.get('food')} cuisine.", self.configurability.get("output_in_caps"))
-        elif self.history_states[-1] == "6":
+        elif self.history_states[-1] == "5" and self.configurability.get("formal") == 'False':
+            self.restaurant_chosen = random.choice(self.restaurants)
+            self.print_w_option(f"5. {self.restaurant_chosen} is a jolly tavern in the {self.slots.get('area')}, "
+                  f"it be a {self.slots.get('pricerange')} tavern serving {self.slots.get('food')} loot.", self.configurability.get("output_in_caps"))
+        
+        elif self.history_states[-1] == "6" and self.configurability.get("formal") == 'True':
             self.print_w_option(f"6. I'm sorry but there is no {self.slots.get('pricerange')} place "
                   f"serving {self.slots.get('food')} cuisine in the {self.slots.get('area')}. What else can I help you with?", self.configurability.get("output_in_caps"))
-        elif self.history_states[-1] == "7":
+        elif self.history_states[-1] == "6" and self.configurability.get("formal") == 'False':
+            self.print_w_option(f"6. Sink me, but there no be a {self.slots.get('pricerange')} tavern "
+                  f"serving {self.slots.get('food')} loot in the {self.slots.get('area')}. What else do ye want?", self.configurability.get("output_in_caps"))
+        
+        elif self.history_states[-1] == "7" and self.configurability.get("formal") == 'True':
             self.print_w_option(f"7. Would you like the phone number, address or postal code of {self.restaurant_chosen}?", self.configurability.get("output_in_caps"))
-        elif self.history_states[-1] == "8":
+        elif self.history_states[-1] == "7" and self.configurability.get("formal") == 'False':
+            self.print_w_option(f"7. Ye want the phone number, address or postal code of {self.restaurant_chosen}?", self.configurability.get("output_in_caps"))
+        
+        elif self.history_states[-1] == "8" and self.configurability.get("formal") == 'True':
             self.print_w_option(f"8. Goodbye and have a nice day!", self.configurability.get("output_in_caps"))
+            exit()
+        elif self.history_states[-1] == "8" and self.configurability.get("formal") == 'False':
+            self.print_w_option(f"8. Ahoy landlubber!", self.configurability.get("output_in_caps"))
             exit()
 
     def classify_intent(self, user_utterance: str) -> str:
@@ -162,8 +193,11 @@ class DialogState:
     def determine_next_state(self) -> str:
         """Determines the next state of the dialog based on the current state, filled slots and the intent of the current utterance."""
         # Always be able to exit
-        if self.history_intents[-1] in ("bye"):
-            print(f"8. Goodbye and have a nice day!")
+        if self.history_intents[-1] in ("bye", "thankyou") and self.configurability.get("formal") == 'True':
+                self.print_w_option(f"8. Goodbye and have a nice day!", self.configurability.get("output_in_caps"))
+                exit()
+        elif self.history_intents[-1] in ("bye", "thankyou") and self.configurability.get("formal") == 'False':
+            self.print_w_option(f"8. Ahoy landlubber!", self.configurability.get("output_in_caps"))
             exit()
 
         if self.history_states[-1] in ("1", "2", "3.1"):
@@ -191,9 +225,13 @@ class DialogState:
             if self.history_intents[-1] == "request":
                 return "7"
             # If the user wants to end the dialog, go to state 8
-            if self.history_intents[-1] in ("bye", "thankyou"):
-                print(f"8. Goodbye and have a nice day!")
+            if self.history_intents[-1] in ("bye", "thankyou") and self.configurability.get("formal") == 'True':
+                self.print_w_option(f"8. Goodbye and have a nice day!", self.configurability.get("output_in_caps"))
                 exit()
+            elif self.history_intents[-1] in ("bye", "thankyou") and self.configurability.get("formal") == 'False':
+                self.print_w_option(f"8. Ahoy landlubber!", self.configurability.get("output_in_caps"))
+                exit()
+        
 
         if self.history_states[-1] in ("5", "6"):
             # If the user wants an alternative, go to state 5
@@ -234,8 +272,8 @@ class DialogState:
     def __str__(self) -> str:
         return f"slots={self.slots}; intent={self.intents[-1]}; state={self.states[-1]}; history_intents={self.history_intents}; history_states={self.history_states}; lookup={self.restaurants}"
     
-    def print_w_option(input: str, all_caps: bool):
-        if all_caps == True:
+    def print_w_option(self, input: str, all_caps):
+        if all_caps == 'True':
             print(input.upper())
         else:
             print(input)

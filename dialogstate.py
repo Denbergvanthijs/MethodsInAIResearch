@@ -122,8 +122,10 @@ class DialogState:
             print("9.3. Does the place have to be child-friendly?")
         elif self.history_states[-1] == "5":
             self.restaurant_chosen = next(self.restaurants)  # if not isinstance(self.restaurants, type(None)) else None
-            print(f"5. {self.restaurant_chosen} is a great restaurant in the {self.slots.get('area')}, "
-                  f"it is a {self.slots.get('pricerange')} restaurant and it serves a {self.slots.get('food')} cuisine.")
+            print(f"5. I recommend {self.restaurant_chosen}, it is a {self.slots.get('pricerange')} {self.slots.get('food')} restaurant"
+                  f" in the {self.slots.get('area')} of town.")
+            if self.slots_preferences["preference"]:
+                print(self.create_reasoning_sentence())
         elif self.history_states[-1] == "6":
             print(f"6. I'm sorry but there is no {self.slots.get('pricerange')} place "
                   f"serving {self.slots.get('food')} cuisine in the {self.slots.get('area')}. What else can I help you with?")
@@ -253,6 +255,36 @@ class DialogState:
 
         return "undefined"  # This should never happen
 
+    def filter_based_on_preferences(self) -> str:
+        """Filters a list of restaurants based on the user's preferences (touristic, romantic,
+        and child-friendliness).
+
+        Returns
+            - A query string with the filtered restaurants
+        """
+        if self.slots_preferences['touristic']:  # touristic
+            query_text += " and (pricerange == 'cheap' or (pricerange == 'moderate' and foodquality == 'good'))"
+        if self.slots_preferences['romantic']:  # romantic
+            query_text += " and crowdedness == 'not busy' and lengthofstay == 'long'"
+        if self.slots_preferences['child']:  # child-friendly
+            query_text += " and lengthofstay == 'short'"
+
+        return query_text
+
+    def create_reasoning_sentence(self):
+        """Creates a reasoning sentence based on the user's preferences."""
+        reasonstr = ''
+
+        if self.slots_preferences['touristic']:  # touristic
+            reasonstr += f"{', and' if len(reasonstr) > 0 else ''} it serves quality food with affordable price"
+        if self.slots_preferences['romantic']:  # romantic
+            reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the restaurant is not too crowded and suitable for long stay"
+        if self.slots_preferences['child']:  # child-friendly
+            reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the place is good for a short visit"
+
+        reasonstr = 'Reasoning: The restaurant matches your preference because' + reasonstr
+        return f"{reasonstr}."
+
     def lookup(self) -> List[str]:
         """Looks up all restaurants in the database that matches the user's preferences."""
         query_text = "ilevel_0 in ilevel_0"
@@ -261,6 +293,8 @@ class DialogState:
             if value != "dontcare" and value is not None:
                 query_text += f" and {key} == '{value}'"
 
+        if self.slots_preferences["preference"]:
+            query_text += self.filter_based_on_preferences()
         df_output = self.restaurant_info.query(query_text)
 
         recommendations = df_output["restaurantname"].values.tolist()
@@ -292,7 +326,7 @@ if __name__ == "__main__":
     dialog_state = DialogState(configurability=configurability)
     dialog_state.act("I'm looking for a cheap brimish food in the north of town")
     dialog_state.act("I'm looking for a restaurant in the center")
-    dialog_state.act("Yes")
+    dialog_state.act("Yes, I would like to provide some preferences")
     dialog_state.act("Yes please!")
     dialog_state.act("No, it is not")
     dialog_state.act("No thank you")

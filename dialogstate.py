@@ -130,6 +130,9 @@ class DialogState:
         elif self.history_states[-1] == "9.3":
             print("9.3. Does the place have to be child-friendly?")
         elif self.history_states[-1] == "5":
+            # Need to do self.lookup() again to apply the user's preferences to the query.
+            # TODO: a better location for calling the self.lookup() ? I personally believe it should be in this function since this is where we "execute" the state.
+            self.lookup()
             self.restaurant_chosen = next(self.restaurants)  # if not isinstance(self.restaurants, type(None)) else None
             print(f"5. I recommend {self.restaurant_chosen}, it is a {self.slots.get('pricerange')} {self.slots.get('food')} restaurant"
                   f" in the {self.slots.get('area')} of town.")

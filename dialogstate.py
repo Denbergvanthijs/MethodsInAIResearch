@@ -142,7 +142,10 @@ class DialogState:
         elif self.history_states[-1] == "7":
             self.print_w_option(f"7. Would you like the phone number, address or postal code of {self.restaurant_chosen}?")
         elif self.history_states[-1] == "8":
-            self.print_w_option(f"8. Goodbye and have a nice day!")
+            if self.configurability.get("formal") == 'True':
+                self.print_w_option(f"8. Goodbye and have a nice day!")
+            else:
+                self.print_w_option(f"8. Ahoy landlubber!")
             exit()
 
     def classify_intent(self, user_utterance: str) -> str:
@@ -207,9 +210,13 @@ class DialogState:
 
     def determine_next_state(self) -> str:
         """Determines the next state of the dialog based on the current state, filled slots and the intent of the current utterance."""
+
         # Always be able to exit
-        if self.history_intents[-1] in ("bye"):
-            self.print_w_option(f"8. Goodbye and have a nice day!")
+        if self.history_intents[-1] in ("bye", "thankyou"):
+            if self.configurability.get("formal") == 'True':
+                self.print_w_option(f"8. Goodbye and have a nice day!")
+            else:
+                self.print_w_option(f"8. Ahoy landlubber!")
             exit()
 
         if self.history_states[-1] in ("1", "2", "3.1"):
@@ -255,7 +262,10 @@ class DialogState:
                 return "7"
             # If the user wants to end the dialog, go to state 8
             if self.history_intents[-1] in ("bye", "thankyou"):
-                self.print_w_option(f"8. Goodbye and have a nice day!")
+                if self.configurability.get("formal") == 'True':
+                    self.print_w_option(f"8. Goodbye and have a nice day!")
+                else:
+                    self.print_w_option(f"8. Ahoy landlubber!")
                 exit()
 
         if self.history_states[-1] in ("5", "6"):
@@ -330,9 +340,7 @@ class DialogState:
         return res_word, res_dist, res_cat
 
     def print_w_option(self, input_utterance: str):
-        all_caps = self.configurability.get("output_in_caps", False)
-
-        if all_caps:
+        if self.configurability.get("output_in_caps", False) == 'True':
             print(input_utterance.upper())
         else:
             print(input_utterance)

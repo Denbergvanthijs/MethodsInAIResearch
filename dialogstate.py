@@ -1,6 +1,7 @@
 import os
 import pickle
 import random
+import time
 from typing import List
 
 import Levenshtein as lev
@@ -104,6 +105,11 @@ class DialogState:
 
     def execute_state(self) -> None:
         """Runs the current state of the dialog."""
+        delay_time = float(self.configurability.get('delay')) / 1000
+        if delay_time > 0:
+            print(f"Please wait ...")
+            time.sleep(delay_time)
+
         if self.history_states[-1] == "1":
             print("1.  Welcome to the UU restaurant system! You can ask for restaurants by area, price range or food type. How may I help you?")
         elif self.history_states[-1] == "2":

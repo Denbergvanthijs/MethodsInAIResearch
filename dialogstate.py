@@ -111,37 +111,38 @@ class DialogState:
     def execute_state(self) -> None:
         """Runs the current state of the dialog."""
         if self.history_states[-1] == "1":
-            print("1.  Welcome to the UU restaurant system! You can ask for restaurants by area, price range or food type. How may I help you?")
+            self.print_w_option(f"1.  Welcome to the UU restaurant system!"
+                                f"You can ask for restaurants by area, price range or food type. How may I help you?")
         elif self.history_states[-1] == "2":
-            print("2. What part of town do you have in mind? Choose from {north, south, east, west, centre}.")
+            self.print_w_option("2. What part of town do you have in mind? Choose from {north, south, east, west, centre}.")
         elif self.history_states[-1] == "3":
-            print("3. What kind of food would you like? Choose any cuisine!")
+            self.print_w_option("3. What kind of food would you like? Choose any cuisine!")
         elif self.history_states[-1] == "3.1":
-            print(f"3.1. There are no restaurants in the {self.slots['area']} area "
-                  f"that serve {self.slots['food']}. What else can I help you with?")
+            self.print_w_option(f"3.1. There are no restaurants in the {self.slots['area']} area "
+                                f"that serve {self.slots['food']}. What else can I help you with?")
         elif self.history_states[-1] == "4":
-            print("4.  Would you like the restaurant to be in the cheap, moderate, or expensive price range?")
+            self.print_w_option("4.  Would you like the restaurant to be in the cheap, moderate, or expensive price range?")
         elif self.history_states[-1] == "9":
-            print("9. Do you have additional requirements? Yes or no?")
+            self.print_w_option("9. Do you have additional requirements? Yes or no?")
         elif self.history_states[-1] == "9.1":
-            print("9.1. Would you like a touristic place?")
+            self.print_w_option("9.1. Would you like a touristic place?")
         elif self.history_states[-1] == "9.2":
-            print("9.2. Is it for a romantic occassion?")
+            self.print_w_option("9.2. Is it for a romantic occassion?")
         elif self.history_states[-1] == "9.3":
-            print("9.3. Does the place have to be child-friendly?")
+            self.print_w_option("9.3. Does the place have to be child-friendly?")
         elif self.history_states[-1] == "5":
             self.restaurant_chosen = next(self.restaurants)  # if not isinstance(self.restaurants, type(None)) else None
-            print(f"5. I recommend {self.restaurant_chosen}, it is a {self.slots.get('pricerange')} {self.slots.get('food')} restaurant"
-                  f" in the {self.slots.get('area')} of town.")
+            self.print_w_option(f"5. I recommend {self.restaurant_chosen}, it is a {self.slots.get('pricerange')} {self.slots.get('food')} restaurant"
+                                f" in the {self.slots.get('area')} of town.")
             if self.slots_preferences["preference"]:
-                print(self.create_reasoning_sentence())
+                self.print_w_option(self.create_reasoning_sentence())
         elif self.history_states[-1] == "6":
-            print(f"6. I'm sorry but there is no {self.slots.get('pricerange')} place "
-                  f"serving {self.slots.get('food')} cuisine in the {self.slots.get('area')}. What else can I help you with?")
+            self.print_w_option(f"6. I'm sorry but there is no {self.slots.get('pricerange')} place "
+                                f"serving {self.slots.get('food')} cuisine in the {self.slots.get('area')}. What else can I help you with?")
         elif self.history_states[-1] == "7":
-            print(f"7. Would you like the phone number, address or postal code of {self.restaurant_chosen}?")
+            self.print_w_option(f"7. Would you like the phone number, address or postal code of {self.restaurant_chosen}?")
         elif self.history_states[-1] == "8":
-            print(f"8. Goodbye and have a nice day!")
+            self.print_w_option(f"8. Goodbye and have a nice day!")
             exit()
 
     def classify_intent(self, user_utterance: str) -> str:
@@ -208,7 +209,7 @@ class DialogState:
         """Determines the next state of the dialog based on the current state, filled slots and the intent of the current utterance."""
         # Always be able to exit
         if self.history_intents[-1] in ("bye"):
-            print(f"8. Goodbye and have a nice day!")
+            self.print_w_option(f"8. Goodbye and have a nice day!")
             exit()
 
         if self.history_states[-1] in ("1", "2", "3.1"):
@@ -254,7 +255,7 @@ class DialogState:
                 return "7"
             # If the user wants to end the dialog, go to state 8
             if self.history_intents[-1] in ("bye", "thankyou"):
-                print(f"8. Goodbye and have a nice day!")
+                self.print_w_option(f"8. Goodbye and have a nice day!")
                 exit()
 
         if self.history_states[-1] in ("5", "6"):
@@ -327,6 +328,14 @@ class DialogState:
                     res_cat = category_name
 
         return res_word, res_dist, res_cat
+
+    def print_w_option(self, input_utterance: str):
+        all_caps = self.configurability.get("output_in_caps", False)
+
+        if all_caps:
+            print(input_utterance.upper())
+        else:
+            print(input_utterance)
 
 
 if __name__ == "__main__":

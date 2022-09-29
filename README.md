@@ -18,7 +18,9 @@ The table below shows the accuracy value of each of these models.
 
 ## Dialog Management
 
-The Dialog Management System can be found in `dialogstate.py`. The user can have a conversation in the CLI with the system via this file. The file `dialogstate_tests.py` contains test cases for all 16 provided examples. Please see the installation instructions to download the required PyPi packages.
+The Dialog Management System can be found in `dialogstate.py`. The user can have a conversation in the CLI with the system via this file. The file `dialogstate_tests.py` contains test cases for all 16 provided examples. Please see the installation instructions to download the required PyPi packages. The configuration of the Dialog Manager can be altered with the `.env` file in the root of this repository. Please note that not all options are implemented yet.
+
+To add random antecedents to the `restaurant_info.csv` file, run the `add_columns.py` script. To add the consequents to the antecedents file, run the `add_consequents.py` script.
 
 ![MAIR Dialog System](./images/MAIR_task_1b.png)
 
@@ -29,7 +31,7 @@ Place the required data files in the `./data/` folder.
 Install the following packages on Python 3.8+:
 
 ```bash
-pip install pandas sklearn spacy python-levenshtein nltk
+pip install pandas sklearn spacy python-levenshtein nltk python-dotenv gTTS playsound==1.2.2
 python -m spacy download en_core_web_sm
 ```
 

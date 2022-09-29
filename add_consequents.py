@@ -8,6 +8,11 @@ def touristic(price, food):
         return True
     else:
         return False
+    
+def assigned_seats(crowdedness):
+  if crowdedness == 'busy':
+    return True
+  return False
 
 
 def child_friendly(stay):
@@ -29,12 +34,13 @@ def romantic(stay, food, price, crowdedness):
 def add_rules(dataframe):
     """Add 3 columns based on handwritten rules for if the restaurant
     is romantic, touristic and child friendly."""
-    t, c, r = [], [], []
+    t, c, r, a = [], [], [], []
     for _, row in dataframe.iterrows():
         t.append(touristic(row["pricerange"], row["foodquality"]))
         c.append(child_friendly(row["lengthofstay"]))
         r.append(romantic(row["lengthofstay"], row["foodquality"], row["pricerange"], row["crowdedness"]))
-    dataframe = dataframe.assign(touristic=t, child_friendly=c, romantic=r)
+        a.append(assigned_seats(row['crowdedness']))
+    dataframe = dataframe.assign(touristic=t, child_friendly=c, romantic=r, assigned_seats=a)
     return (dataframe)
 
 

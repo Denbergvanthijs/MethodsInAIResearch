@@ -12,6 +12,18 @@ from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 
+# # For Mac machines, uncomment these 7 lines below to bypass SSL checking for NLTK
+# import ssl
+#
+# try:
+#     _create_unverified_https_context = ssl._create_unverified_context
+# except AttributeError:
+#     pass
+# else:
+#     ssl._create_default_https_context = _create_unverified_https_context
+#
+# nltk.download('punkt')
+
 nltk.download("stopwords")
 
 

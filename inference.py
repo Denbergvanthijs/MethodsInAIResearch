@@ -60,7 +60,8 @@ if len(restos['area']) < 1:
 else:
     satisfied = False
     for key, val in restos['restaurantname'].items():
-        print(f"I recommend { val }, it is a { restos['pricerange'][key] } { restos['food'][key] } restaurant in the { restos['area'][key] } of town.\n{ reasoning }")
+        print(
+            f"I recommend { val }, it is a { restos['pricerange'][key] } { restos['food'][key] } restaurant in the { restos['area'][key] } of town.\n{ reasoning }")
 
         response = input("Are you happy with this recommendation? ")
         if response.lower() == 'y' or response.lower() == 'yes':

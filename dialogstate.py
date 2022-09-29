@@ -273,11 +273,20 @@ class DialogState:
         """
         query_text = ''
         if self.slots_preferences['touristic']:  # touristic
-            query_text += " and (pricerange == 'cheap' or (pricerange == 'moderate' and foodquality == 'good'))"
+            if self.configurability.get('insert_errors') == 'True':  # intentional mistake
+                query_text += " and (pricerange == 'expensive' or (pricerange == 'cheap' and foodquality == 'acceptable'))"
+            else:
+                query_text += " and (pricerange == 'cheap' or (pricerange == 'moderate' and foodquality == 'good'))"
         if self.slots_preferences['romantic']:  # romantic
-            query_text += " and crowdedness == 'not busy' and lengthofstay == 'long'"
+            if self.configurability.get('insert_errors') == 'True':  # intentional mistake
+                query_text += " and crowdedness == 'busy' and lengthofstay == 'long'"
+            else:
+                query_text += " and crowdedness == 'not busy' and lengthofstay == 'long'"
         if self.slots_preferences['child']:  # child-friendly
-            query_text += " and lengthofstay == 'short'"
+            if self.configurability.get('insert_errors') == 'True':  # intentional mistake
+                query_text += " and lengthofstay == 'short'"
+            else:
+                query_text += " and lengthofstay == 'short'"
 
         return query_text
 

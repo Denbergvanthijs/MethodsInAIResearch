@@ -10,9 +10,9 @@ def touristic(price, food):
         return False
     
 def assigned_seats(crowdedness):
-  if crowdedness == 'busy':
-    return True
-  return False
+    if crowdedness == 'busy':
+        return True
+    return False
 
 
 def child_friendly(stay):

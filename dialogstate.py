@@ -271,6 +271,7 @@ class DialogState:
         Returns
             - A query string with the filtered restaurants
         """
+        query_text = ''
         if self.slots_preferences['touristic']:  # touristic
             query_text += " and (pricerange == 'cheap' or (pricerange == 'moderate' and foodquality == 'good'))"
         if self.slots_preferences['romantic']:  # romantic

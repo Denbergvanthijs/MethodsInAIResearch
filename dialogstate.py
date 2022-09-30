@@ -1,6 +1,7 @@
 import os
 import pickle
 import random
+import time
 import ssl
 from itertools import cycle
 from typing import List
@@ -14,15 +15,17 @@ from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 
+# For Mac machines, uncomment these 7 lines below to bypass SSL checking for NLTK
+import ssl
+
 try:
     _create_unverified_https_context = ssl._create_unverified_context
 except AttributeError:
     pass
 else:
     ssl._create_default_https_context = _create_unverified_https_context
-
-nltk.download('stopwords')
 nltk.download('punkt')
+nltk.download("stopwords")
 
 
 class DialogState:
@@ -111,6 +114,11 @@ class DialogState:
 
     def execute_state(self) -> None:
         """Runs the current state of the dialog."""
+        delay_time = float(self.configurability.get('delay')) / 1000
+        if delay_time > 0:
+            print(f"Please wait ...")
+            time.sleep(delay_time)
+
         if self.history_states[-1] == "1":
             if self.formal:
                 self.print_w_option(f"1.  Welcome to the UU restaurant system!"

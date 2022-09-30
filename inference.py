@@ -1,12 +1,12 @@
 import pandas as pd
 
 
-def filter_based_on_preferences(restaurants, preferences: dict):
+def filter_based_on_preferences(restaurants: pd.DataFrame, preferences: dict):
     """Filters a list of restaurants based on the user's preferences (touristic, romantic,
     and child-friendliness).
 
     Parameters
-        - restaurants: (list) A list of Restaurant objects.
+        - restaurants: A DataFrame containing the restaurants
         - preferences: (list) An array of int denoting the user's preferences. Contains 3 elements, which are
         mapped to: [0] touristic, [1] romantic, [2] child-friendliness. Each element can only be 1 (for true) or 0 (for false).
     Returns
@@ -26,7 +26,8 @@ def filter_based_on_preferences(restaurants, preferences: dict):
     return res
 
 
-def create_reasoning_sentence(preferences):
+def create_reasoning_sentence(preferences: dict):
+    """Creates a reasoning sentence based on the user's preferences."""
     reasonstr = ''
 
     if preferences['touristic']:  # touristic
@@ -60,8 +61,8 @@ if len(restos['area']) < 1:
 else:
     satisfied = False
     for key, val in restos['restaurantname'].items():
-        print(
-            f"I recommend { val }, it is a { restos['pricerange'][key] } { restos['food'][key] } restaurant in the { restos['area'][key] } of town.\n{ reasoning }")
+        print(f"I recommend { val }, it is a { restos['pricerange'][key] } { restos['food'][key] } restaurant"
+              f" in the { restos['area'][key] } of town.\n{ reasoning }")
 
         response = input("Are you happy with this recommendation? ")
         if response.lower() == 'y' or response.lower() == 'yes':

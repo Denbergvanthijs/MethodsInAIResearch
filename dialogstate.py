@@ -26,7 +26,7 @@ nltk.download('punkt')
 
 
 class DialogState:
-    def __init__(self, fp_restaurant_info: str = "./data/restaurant_info.csv", fp_dialog_acts: str = "./data/dialog_acts.dat", fp_pickle: str = "./data/logreg.pkl", configurability: dict = {}) -> None:
+    def __init__(self, fp_restaurant_info: str = "./data/restaurant_data.csv", fp_dialog_acts: str = "./data/dialog_acts.dat", fp_pickle: str = "./data/logreg.pkl", configurability: dict = {}) -> None:
         self.history_utterances = []
         self.history_states = ["1"]  # Start with state 1
         self.history_intents = [None]  # Start with no intent for state 1
@@ -366,6 +366,7 @@ class DialogState:
 
         if self.slots_preferences["preference"]:
             query_text += self.filter_based_on_preferences()
+        print(query_text)
         df_output = self.restaurant_info.query(query_text)
 
         recommendations = df_output["restaurantname"].values.tolist()

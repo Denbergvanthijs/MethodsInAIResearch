@@ -24,6 +24,21 @@ To add random antecedents to the `restaurant_info.csv` file, run the `add_column
 
 ![MAIR Dialog System](./images/MAIR_task_1b.png)
 
+## Configurability
+
+The system currently supports four configurability:
+
+- Ask user about correctness of match for Levenshtein results
+    `max_lev_distance=3` (integer 1 or higher)
+- Insert artificial errors in preference extraction
+    `insert_errors=False` (True or False)
+- Use formal or informal phrases in system utterances
+    `formal=False` (True or False)
+- Introduce a delay before showing system responses
+    `delay=0` (in milliseconds)
+
+These options can be altered in the `.env` in the root of this repository.
+
 ## Installation
 
 Place the required data files in the `./data/` folder.

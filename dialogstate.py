@@ -154,6 +154,9 @@ class DialogState:
             self.print_w_option("9.3. Does the place have to be child-friendly?")
 
         elif self.history_states[-1] == "5":
+            # Need to do self.lookup() again to apply the user's preferences to the query.
+            # TODO: a better location for calling the self.lookup() ? I personally believe it should be in this function since this is where we "execute" the state.
+            self.lookup()
             self.restaurant_chosen = next(self.restaurants)  # if not isinstance(self.restaurants, type(None)) else None
             if self.formal:
                 self.print_w_option(f"5. I recommend {self.restaurant_chosen}, it is a {self.slots.get('pricerange')} {self.slots.get('food')} restaurant"
@@ -318,12 +321,22 @@ class DialogState:
         Returns
             - A query string with the filtered restaurants
         """
+        query_text = ''
         if self.slots_preferences['touristic']:  # touristic
-            query_text += " and (pricerange == 'cheap' or (pricerange == 'moderate' and foodquality == 'good'))"
+            if self.configurability.get('insert_errors') == 'True':  # intentional mistake
+                query_text += " and (pricerange == 'expensive' or (pricerange == 'cheap' and foodquality == 'acceptable'))"
+            else:
+                query_text += " and (pricerange == 'cheap' or (pricerange == 'moderate' and foodquality == 'good'))"
         if self.slots_preferences['romantic']:  # romantic
-            query_text += " and crowdedness == 'not busy' and lengthofstay == 'long'"
+            if self.configurability.get('insert_errors') == 'True':  # intentional mistake
+                query_text += " and crowdedness == 'busy' and lengthofstay == 'long'"
+            else:
+                query_text += " and crowdedness == 'not busy' and lengthofstay == 'long'"
         if self.slots_preferences['child']:  # child-friendly
-            query_text += " and lengthofstay == 'short'"
+            if self.configurability.get('insert_errors') == 'True':  # intentional mistake
+                query_text += " and lengthofstay == 'short'"
+            else:
+                query_text += " and lengthofstay == 'short'"
 
         return query_text
 

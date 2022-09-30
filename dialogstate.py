@@ -56,6 +56,7 @@ class DialogState:
         self.stopwords = stopwords.words("english")
 
         self.configurability = configurability
+        self.formal = self.configurability.get("formal") == 'True'
 
         # Save the model to a pickle file to speedup the loading process
         if not os.path.exists(fp_pickle):
@@ -111,37 +112,77 @@ class DialogState:
     def execute_state(self) -> None:
         """Runs the current state of the dialog."""
         if self.history_states[-1] == "1":
-            print("1.  Welcome to the UU restaurant system! You can ask for restaurants by area, price range or food type. How may I help you?")
+            if self.formal:
+                self.print_w_option(f"1.  Welcome to the UU restaurant system!"
+                                    f"You can ask for restaurants by area, price range or food type. How may I help you?")
+            else:
+                self.print_w_option(
+                    "1. Yarr matey, I be recommending you the best taverns! Tell me your price range, area, and food wishes or I'll throw you off my ship!")
+
         elif self.history_states[-1] == "2":
-            print("2. What part of town do you have in mind? Choose from {north, south, east, west, centre}.")
+            if self.formal:
+                self.print_w_option("2. What part of town do you have in mind? Choose from {north, south, east, west, centre}.")
+            else:
+                self.print_w_option("2. Look at your compass landlubber, be it pointing north, south, east or west?")
+
         elif self.history_states[-1] == "3":
-            print("3. What kind of food would you like? Choose any cuisine!")
+            if self.formal:
+                self.print_w_option("3. What kind of food would you like? Choose any cuisine!")
+            else:
+                self.print_w_option("3. Yer don't want scurvy right? Pick a food!")
+
         elif self.history_states[-1] == "3.1":
-            print(f"3.1. There are no restaurants in the {self.slots['area']} area "
-                  f"that serve {self.slots['food']}. What else can I help you with?")
+            if self.formal:
+                self.print_w_option(f"3.1. There are no restaurants in the {self.slots['area']} area "
+                                    f"that serve {self.slots['food']}. What else can I help you with?")
+            else:
+                self.print_w_option(f"3.1. There no be taverns in the {self.slots['area']} area "
+                                    f"that serve {self.slots['food']} loot. Any alternatives?")
+
         elif self.history_states[-1] == "4":
-            print("4.  Would you like the restaurant to be in the cheap, moderate, or expensive price range?")
+            if self.formal:
+                self.print_w_option("4.  Would you like the restaurant to be in the cheap, moderate, or expensive price range?")
+            else:
+                self.print_w_option("4.  I hope ye got some doubloons, pick a cheap, moderate or expensive tavern.",)
         elif self.history_states[-1] == "9":
-            print("9. Do you have additional requirements? Yes or no?")
+            self.print_w_option("9. Do you have additional requirements? Yes or no?")
         elif self.history_states[-1] == "9.1":
-            print("9.1. Would you like a touristic place?")
+            self.print_w_option("9.1. Would you like a touristic place?")
         elif self.history_states[-1] == "9.2":
-            print("9.2. Is it for a romantic occassion?")
+            self.print_w_option("9.2. Is it for a romantic occassion?")
         elif self.history_states[-1] == "9.3":
-            print("9.3. Does the place have to be child-friendly?")
+            self.print_w_option("9.3. Does the place have to be child-friendly?")
+
         elif self.history_states[-1] == "5":
             self.restaurant_chosen = next(self.restaurants)  # if not isinstance(self.restaurants, type(None)) else None
-            print(f"5. I recommend {self.restaurant_chosen}, it is a {self.slots.get('pricerange')} {self.slots.get('food')} restaurant"
-                  f" in the {self.slots.get('area')} of town.")
+            if self.formal:
+                self.print_w_option(f"5. I recommend {self.restaurant_chosen}, it is a {self.slots.get('pricerange')} {self.slots.get('food')} restaurant"
+                                    f" in the {self.slots.get('area')} of town.")
+            else:
+                self.print_w_option(f"5. {self.restaurant_chosen} is a jolly tavern in the {self.slots.get('area')}, "
+                                    f"it be a {self.slots.get('pricerange')} tavern serving {self.slots.get('food')} loot.")
             if self.slots_preferences["preference"]:
-                print(self.create_reasoning_sentence())
+                self.print_w_option(self.create_reasoning_sentence())  # TODO: implement informal for reasoning sentence
+
         elif self.history_states[-1] == "6":
-            print(f"6. I'm sorry but there is no {self.slots.get('pricerange')} place "
-                  f"serving {self.slots.get('food')} cuisine in the {self.slots.get('area')}. What else can I help you with?")
+            if self.formal:
+                self.print_w_option(f"6. I'm sorry but there is no {self.slots.get('pricerange')} place "
+                                    f"serving {self.slots.get('food')} cuisine in the {self.slots.get('area')}. What else can I help you with?")
+            else:
+                self.print_w_option(f"6. Sink me, but there no be a {self.slots.get('pricerange')} tavern "
+                                    f"serving {self.slots.get('food')} loot in the {self.slots.get('area')}. What else do ye want?")
+
         elif self.history_states[-1] == "7":
-            print(f"7. Would you like the phone number, address or postal code of {self.restaurant_chosen}?")
+            if self.formal:
+                self.print_w_option(f"7. Would you like the phone number, address or postal code of {self.restaurant_chosen}?")
+            else:
+                self.print_w_option(f"7. Ye want the phone number, address or postal code of {self.restaurant_chosen}?")
+
         elif self.history_states[-1] == "8":
-            print(f"8. Goodbye and have a nice day!")
+            if self.configurability.get("formal") == 'True':
+                self.print_w_option(f"8. Goodbye and have a nice day!")
+            else:
+                self.print_w_option(f"8. Ahoy landlubber!")
             exit()
 
     def classify_intent(self, user_utterance: str) -> str:
@@ -206,9 +247,13 @@ class DialogState:
 
     def determine_next_state(self) -> str:
         """Determines the next state of the dialog based on the current state, filled slots and the intent of the current utterance."""
+
         # Always be able to exit
-        if self.history_intents[-1] in ("bye"):
-            print(f"8. Goodbye and have a nice day!")
+        if self.history_intents[-1] in ("bye", "thankyou"):
+            if self.formal:
+                self.print_w_option(f"8. Goodbye and have a nice day!")
+            else:
+                self.print_w_option(f"8. Ahoy landlubber!")
             exit()
 
         if self.history_states[-1] in ("1", "2", "3.1"):
@@ -254,8 +299,10 @@ class DialogState:
                 return "7"
             # If the user wants to end the dialog, go to state 8
             if self.history_intents[-1] in ("bye", "thankyou"):
-                print(f"8. Goodbye and have a nice day!")
-                exit()
+                if self.formal:
+                    self.print_w_option(f"8. Goodbye and have a nice day!")
+                else:
+                    self.print_w_option(f"8. Ahoy landlubber!")
 
         if self.history_states[-1] in ("5", "6"):
             # If the user wants an alternative, go to state 5
@@ -328,6 +375,12 @@ class DialogState:
 
         return res_word, res_dist, res_cat
 
+    def print_w_option(self, input_utterance: str):
+        if self.formal:
+            print(input_utterance.upper())
+        else:
+            print(input_utterance)
+
 
 if __name__ == "__main__":
     configurability = dotenv_values(".env")
@@ -338,7 +391,7 @@ if __name__ == "__main__":
     dialog_state.act("Yes, I would like to provide some preferences")
     dialog_state.act("Yes please!")
     dialog_state.act("No, it is not")
-    dialog_state.act("No thank you")
+    dialog_state.act("Nope")
     dialog_state.act("Thank you!")
 
     # dialog_state = DialogState(configurability=configurability)

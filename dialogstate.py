@@ -321,20 +321,22 @@ class DialogState:
         Returns
             - A query string with the filtered restaurants
         """
+        insert_errors = self.configurability.get('insert_errors') == 'True'
+
         query_text = ''
         if self.slots_preferences['touristic']:  # touristic
-            if self.configurability.get('insert_errors') == 'True':  # intentional mistake
+            if insert_errors:  # intentional mistake
                 query_text += " and (pricerange == 'expensive' or (pricerange == 'cheap' and foodquality == 'acceptable'))"
             else:
                 query_text += " and (pricerange == 'cheap' or (pricerange == 'moderate' and foodquality == 'good'))"
         if self.slots_preferences['romantic']:  # romantic
-            if self.configurability.get('insert_errors') == 'True':  # intentional mistake
+            if insert_errors:  # intentional mistake
                 query_text += " and crowdedness == 'busy' and lengthofstay == 'long'"
             else:
                 query_text += " and crowdedness == 'not busy' and lengthofstay == 'long'"
         if self.slots_preferences['child']:  # child-friendly
-            if self.configurability.get('insert_errors') == 'True':  # intentional mistake
-                query_text += " and lengthofstay == 'short'"
+            if insert_errors:  # intentional mistake
+                query_text += " and lengthofstay == 'long'"
             else:
                 query_text += " and lengthofstay == 'short'"
 

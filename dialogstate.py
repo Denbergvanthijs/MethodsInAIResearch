@@ -1,6 +1,7 @@
 import os
 import pickle
 import random
+import ssl
 from itertools import cycle
 from typing import List
 
@@ -13,8 +14,6 @@ from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 
-import ssl
-
 try:
     _create_unverified_https_context = ssl._create_unverified_context
 except AttributeError:
@@ -24,6 +23,7 @@ else:
 
 nltk.download('stopwords')
 nltk.download('punkt')
+
 
 class DialogState:
     def __init__(self, fp_restaurant_info: str = "./data/restaurant_info.csv", fp_dialog_acts: str = "./data/dialog_acts.dat", fp_pickle: str = "./data/logreg.pkl", configurability: dict = {}) -> None:

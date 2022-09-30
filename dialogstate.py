@@ -112,7 +112,7 @@ class DialogState:
 
     def execute_state(self) -> None:
         """Runs the current state of the dialog."""
-        delay_time = float(self.configurability.get('delay')) / 1000
+        delay_time = float(self.configurability.get('delay', 0)) / 1000
 
         if delay_time > 0:
             self.print_w_option(f"Please wait ...")

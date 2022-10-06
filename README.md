@@ -13,8 +13,12 @@ As well as three different machine learning classifiers for intent detection:
 - Logistic regression (`ml_logreg.py`)
 - Linear SVC (`ml_lsvc.py`)
 
-The table below shows the accuracy value of each of these models.
-![Accuracy](https://user-images.githubusercontent.com/113440512/190705271-9dd0c622-f359-4fe5-a8f8-ff54bd6ae8c9.png)
+The table below shows the accuracy value of each of these models:
+
+|                    | **Baseline (majority)** | **Baseline rule-based system** | **kNN model** | **Logistic regression** | **Linear SVC** |
+|--------------------|-------------------------|---------------------------------|---------------|-------------------------|----------------|
+| **Test accuracy**  |                   0,400 |                           0,903 |         0,962 |                   0,980 |          0,955 |
+| **Train accuracy** |                   0,398 |                                 |         0,968 |                         |                |
 
 ## Dialog Management
 

@@ -97,7 +97,7 @@ class DialogState:
 
         if self.history_states[-1] in ("9", "9.1", "9.2", "9.3"):
             self.fill_slots_preferences(user_utterance_processed)
-        else:
+        elif self.history_states[-1] in ("1", "2", "3", "3.1", "4"):
             self.fill_slots(user_utterance_processed)
 
         next_state = self.determine_next_state()

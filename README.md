@@ -68,3 +68,5 @@ pip install autopep8 flake8 flake8-import-order flake8-blind-except flake8-built
 
 - Dontcares only work if said after states 2, 3, or 4. Preferably, the system automatically figures out to what slot dontcares belong to
 - A minimal example for text-to-speech can be found in `tts.py`, this is sadly not yet implemented
+- Asking the user if they would like a place with or without assigned seating is not yet implemented
+- Not all options in the configuration file are implemented yet

@@ -161,9 +161,6 @@ class DialogState:
             self.print_w_option("9.3. Does the place have to be child-friendly?")
 
         elif self.history_states[-1] == "5":
-            # Need to do self.lookup() again to apply the user's preferences to the query.
-            # TODO: a better location for calling the self.lookup() ? I personally believe it should be in this function since this is where we "execute" the state.
-            self.lookup()
             self.restaurant_chosen = next(self.restaurants)  # if not isinstance(self.restaurants, type(None)) else None
             if self.formal:
                 self.print_w_option(f"5. I recommend {self.restaurant_chosen}, it is a {self.slots.get('pricerange')} {self.slots.get('food')} restaurant"
@@ -301,7 +298,10 @@ class DialogState:
             return "9.3"
 
         if self.history_states[-1] in ("9.3"):
-            return "5"
+            if not self.lookup():
+                return "6"
+            else:
+                return "5"
 
         if self.history_states[-1] in ("5", "6", "7"):
             # If the user wants to know more about the restaurant, go to state 7

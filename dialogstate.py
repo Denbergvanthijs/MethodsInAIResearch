@@ -16,14 +16,15 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 
 try:
-    # For Mac machines, uncomment these 7 lines below to bypass SSL checking for NLTK
+    # For Mac machines, bypass SSL checking for NLTK
     _create_unverified_https_context = ssl._create_unverified_context
 except AttributeError:
     pass
 else:
     ssl._create_default_https_context = _create_unverified_https_context
-nltk.download('punkt')
-nltk.download("stopwords")
+finally:
+    nltk.download("punkt")
+    nltk.download("stopwords")
 
 
 class DialogState:
@@ -112,7 +113,7 @@ class DialogState:
 
     def execute_state(self) -> None:
         """Runs the current state of the dialog."""
-        delay_time = float(self.configurability.get('delay', 0)) / 1000
+        delay_time = float(self.configurability.get("delay", 0)) / 1000
 
         if delay_time > 0:
             self.print_w_option(f"Please wait ...")
@@ -246,7 +247,7 @@ class DialogState:
 
         # Backup, if the intent is not "affirm"
         for word in user_utterance.split():
-            if word in ('y', 'yes'):
+            if word in ("y", "yes"):
                 self.slots_preferences[slot_preference] = True
                 return  # Early return
 
@@ -419,7 +420,3 @@ if __name__ == "__main__":
     dialog_state.act("No, it is not")
     dialog_state.act("Nope")
     dialog_state.act("Thank you!")
-
-    # dialog_state = DialogState(configurability=configurability)
-    # while True:
-    #     dialog_state.act()

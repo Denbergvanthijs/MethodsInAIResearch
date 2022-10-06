@@ -161,9 +161,6 @@ class DialogState:
             self.print_w_option("9.3. Does the place have to be child-friendly?")
 
         elif self.history_states[-1] == "5":
-            # Need to do self.lookup() again to apply the user's preferences to the query.
-            # TODO: a better location for calling the self.lookup() ? I personally believe it should be in this function since this is where we "execute" the state.
-            self.lookup()
             self.restaurant_chosen = next(self.restaurants)  # if not isinstance(self.restaurants, type(None)) else None
             if self.formal:
                 self.print_w_option(f"5. I recommend {self.restaurant_chosen}, it is a {self.slots.get('pricerange')} {self.slots.get('food')} restaurant"
@@ -301,7 +298,10 @@ class DialogState:
             return "9.3"
 
         if self.history_states[-1] in ("9.3"):
-            return "5"
+            if not self.lookup():
+                return "6"
+            else:
+                return "5"
 
         if self.history_states[-1] in ("5", "6", "7"):
             # If the user wants to know more about the restaurant, go to state 7
@@ -314,10 +314,13 @@ class DialogState:
                 else:
                     self.print_w_option(f"8. Ahoy landlubber!")
 
-        if self.history_states[-1] in ("5", "6"):
-            # If the user wants an alternative, go to state 5
-            if self.history_intents[-1] == "reqalts":
-                return "5"
+        if self.history_states[-1] == "5" and self.history_intents[-1] == "reqalts":
+            # In state 5 (self.restaurants is not empty), so user can loop through the findings.
+            return "5"
+
+        if self.history_states[-1] == "6" and self.history_intents[-1] == "reqalts":
+            # In state 6 (self.restaurants is empty), so cannot call next() on self.restaurants.
+            return "6"
 
         return "undefined"  # This should never happen
 

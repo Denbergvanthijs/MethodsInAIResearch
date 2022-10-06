@@ -16,9 +16,9 @@ As well as three different machine learning classifiers for intent detection:
 The table below shows the accuracy value of each of these models:
 
 |                    | **Baseline (majority)** | **Baseline rule-based system** | **kNN model** | **Logistic regression** | **Linear SVC** |
-|--------------------|-------------------------|---------------------------------|---------------|-------------------------|----------------|
-| **Test accuracy**  |                   0,400 |                           0,903 |         0,962 |                   0,980 |          0,955 |
-| **Train accuracy** |                   0,398 |                                 |         0,968 |                         |                |
+|--------------------|-------------------------|--------------------------------|---------------|-------------------------|----------------|
+| **Test accuracy**  |                   0,400 |                          0,903 |         0,962 |                   0,983 |          0,958 |
+| **Train accuracy** |                   0,398 |                                |         0,968 |                   0,987 |          0,962 |
 
 ## Dialog Management
 

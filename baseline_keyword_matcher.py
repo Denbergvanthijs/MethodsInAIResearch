@@ -1,5 +1,4 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
 
 df = pd.read_csv('./data/dialog_acts.dat', header=None, sep='\s\s+', engine='python')
 
@@ -7,8 +6,6 @@ df = pd.read_csv('./data/dialog_acts.dat', header=None, sep='\s\s+', engine='pyt
 df['intent'] = df[0].str.split(" ", 1).str[0]
 df[0] = df[0].str.split(n=1).str[1]
 df.rename(columns={df.columns[0]: "utterance"}, inplace=True)
-
-train, test = train_test_split(df, test_size=0.2)
 
 names = ['ack', 'affirm', 'bye', 'confirm', 'deny', 'hello', 'inform',
          'negate', 'null', 'repeat', 'reqalts', 'reqmore', 'request',

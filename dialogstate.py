@@ -376,7 +376,7 @@ class DialogState:
 
         if self.slots_preferences["preference"]:
             query_text += self.filter_based_on_preferences()
-        print(query_text)
+
         df_output = self.restaurant_info.query(query_text)
 
         recommendations = df_output["restaurantname"].values.tolist()

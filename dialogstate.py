@@ -196,6 +196,10 @@ class DialogState:
             self.print_w_option(f"10. Sorry, I cannot find a place that matches your criteria."
                                 f" Would you like to try searching without the additional preferences?")
 
+        elif self.history_states[-1] == "11":
+            self.print_w_option(f"11. Sorry, I cannot find a place that matches your criteria"
+                                f" Would you like me to try broadening your search?")
+
     def classify_intent(self, user_utterance: str) -> str:
         """Classifies the intent of the user utterance using a logistic regression model."""
         return self.intent_model.predict(self.vec.transform([user_utterance]))[0]
@@ -283,7 +287,7 @@ class DialogState:
         if self.history_states[-1] in ("1", "2", "3.1", "3", "4"):
             # If no restaurant in DB matches the user's preferences, go to state 6
             if not self.lookup():
-                return "6"
+                return "11"
             else:
                 return "9"
 
@@ -311,6 +315,17 @@ class DialogState:
             if self.history_intents[-1] == "affirm":
                 # drop the preferences
                 self.slots_preferences = {"preference": None, "touristic": None, "romantic": None, "child": None}
+                if not self.lookup():
+                    return "11"
+                else:
+                    return "5"
+            elif self.history_intents[-1] in ("negate", "deny"):
+                return "6"
+
+        if self.history_states[-1] == "11":
+            if self.history_intents[-1] == "affirm":
+                self.slots["pricerange"] = None
+                self.slots["area"] = None
                 if not self.lookup():
                     return "6"
                 else:

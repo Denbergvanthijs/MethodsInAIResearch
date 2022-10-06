@@ -314,10 +314,13 @@ class DialogState:
                 else:
                     self.print_w_option(f"8. Ahoy landlubber!")
 
-        if self.history_states[-1] in ("5", "6"):
-            # If the user wants an alternative, go to state 5
-            if self.history_intents[-1] == "reqalts":
-                return "5"
+        if self.history_states[-1] == "5" and self.history_intents[-1] == "reqalts":
+            # In state 5 (self.restaurants is not empty), so user can loop through the findings.
+            return "5"
+
+        if self.history_states[-1] == "6" and self.history_intents[-1] == "reqalts":
+            # In state 6 (self.restaurants is empty), so cannot call next() on self.restaurants.
+            return "6"
 
         return "undefined"  # This should never happen
 

@@ -156,7 +156,7 @@ class DialogState:
         elif self.history_states[-1] == "9.1":
             self.print_w_option("9.1. Would you like a touristic place?")
         elif self.history_states[-1] == "9.2":
-            self.print_w_option("9.2. Is it for a romantic occassion?")
+            self.print_w_option("9.2. Is it for a romantic occasion?")
         elif self.history_states[-1] == "9.3":
             self.print_w_option("9.3. Does the place have to be child-friendly?")
 

@@ -59,6 +59,7 @@ class DialogState:
 
         self.configurability = configurability
         self.formal = self.configurability.get("formal") == 'True'
+        self.output_in_caps = self.configurability.get("output_in_caps") == 'True'
 
         # Save the model to a pickle file to speedup the loading process
         if not os.path.exists(fp_pickle):
@@ -403,7 +404,7 @@ class DialogState:
         return res_word, res_dist, res_cat
 
     def print_w_option(self, input_utterance: str):
-        if self.formal:
+        if self.output_in_caps:
             print(input_utterance.upper())
         else:
             print(input_utterance)
@@ -413,7 +414,7 @@ if __name__ == "__main__":
     configurability = dotenv_values(".env")
 
     dialog_state = DialogState(configurability=configurability)
-    dialog_state.act("I'm looking for a cheap brimish food in the north of town")
+    dialog_state.act("I'm looking for cheap brimish food in the north of town")
     dialog_state.act("I'm looking for a restaurant in the center")
     dialog_state.act("Yes, I would like to provide some preferences")
     dialog_state.act("Yes please!")

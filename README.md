@@ -32,7 +32,7 @@ To add random antecedents to the `restaurant_info.csv` file, run the `add_column
 
 ## Configurability
 
-The system currently supports four configurability:
+The system currently supports four configurability options:
 
 - Ask user about correctness of match for Levenshtein results
     `max_lev_distance=3` (integer 1 or higher)

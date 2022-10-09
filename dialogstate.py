@@ -28,7 +28,9 @@ finally:
 
 
 class DialogState:
-    def __init__(self, fp_restaurant_info: str = "./data/restaurant_data.csv", fp_dialog_acts: str = "./data/dialog_acts.dat", fp_pickle: str = "./data/logreg.pkl", configurability: dict = {}) -> None:
+    def __init__(self, fp_restaurant_info: str = "./data/restaurant_data.csv", fp_dialog_acts: str = "./data/dialog_acts.dat",
+                 fp_pickle: str = "./data/logreg.pkl", configurability: dict = {}) -> None:
+        """Initializes the Dialog State Manager."""
         self.history_utterances = []
         self.history_states = ["1"]  # Start with state 1
         self.history_intents = [None]  # Start with no intent for state 1
@@ -117,16 +119,16 @@ class DialogState:
         delay_time = float(self.configurability.get("delay", 0)) / 1000
 
         if delay_time > 0:
-            self.print_w_option(f"Please wait ...")
+            self.print_w_option("Please wait ...")
             time.sleep(delay_time)
 
         if self.history_states[-1] == "1":
             if self.formal:
-                self.print_w_option(f"1.  Welcome to the UU restaurant system!"
-                                    f"You can ask for restaurants by area, price range or food type. How may I help you?")
+                self.print_w_option("1.  Welcome to the UU restaurant system!"
+                                    "You can ask for restaurants by area, price range or food type. How may I help you?")
             else:
-                self.print_w_option(
-                    "1. Yarr matey, I be recommending you the best taverns! Tell me your price range, area, and food wishes or I'll throw you off my ship!")
+                self.print_w_option("1. Yarr matey, I be recommending you the best taverns! Tell me your price range, area, "
+                                    "and food wishes or I'll throw you off my ship!")
 
         elif self.history_states[-1] == "2":
             if self.formal:
@@ -165,7 +167,8 @@ class DialogState:
         elif self.history_states[-1] == "5":
             self.restaurant_chosen = next(self.restaurants)  # if not isinstance(self.restaurants, type(None)) else None
             if self.formal:
-                self.print_w_option(f"5. I recommend {self.restaurant_chosen}, it is a {self.slots.get('pricerange')} {self.slots.get('food')} restaurant"
+                self.print_w_option(f"5. I recommend {self.restaurant_chosen}, it is a {self.slots.get('pricerange')} "
+                                    f"{self.slots.get('food')} restaurant"
                                     f" in the {self.slots.get('area')} of town.")
             else:
                 self.print_w_option(f"5. {self.restaurant_chosen} is a jolly tavern in the {self.slots.get('area')}, "
@@ -176,7 +179,8 @@ class DialogState:
         elif self.history_states[-1] == "6":
             if self.formal:
                 self.print_w_option(f"6. I'm sorry but there is no {self.slots.get('pricerange')} place "
-                                    f"serving {self.slots.get('food')} cuisine in the {self.slots.get('area')}. What else can I help you with?")
+                                    f"serving {self.slots.get('food')} cuisine in the {self.slots.get('area')}."
+                                    "What else can I help you with?")
             else:
                 self.print_w_option(f"6. Sink me, but there no be a {self.slots.get('pricerange')} tavern "
                                     f"serving {self.slots.get('food')} loot in the {self.slots.get('area')}. What else do ye want?")
@@ -189,18 +193,18 @@ class DialogState:
 
         elif self.history_states[-1] == "8":
             if self.configurability.get("formal") == 'True':
-                self.print_w_option(f"8. Goodbye and have a nice day!")
+                self.print_w_option("8. Goodbye and have a nice day!")
             else:
-                self.print_w_option(f"8. Ahoy landlubber!")
+                self.print_w_option("8. Ahoy landlubber!")
             exit()
 
         elif self.history_states[-1] == "10":
-            self.print_w_option(f"10. Sorry, I cannot find a place that matches your criteria."
-                                f" Would you like to try searching without the additional preferences?")
+            self.print_w_option("10. Sorry, I cannot find a place that matches your criteria."
+                                " Would you like to try searching without the additional preferences?")
 
         elif self.history_states[-1] == "11":
-            self.print_w_option(f"11. Sorry, I cannot find a place that matches your criteria"
-                                f" Would you like me to try broadening your search?")
+            self.print_w_option("11. Sorry, I cannot find a place that matches your criteria"
+                                " Would you like me to try broadening your search?")
 
     def classify_intent(self, user_utterance: str) -> str:
         """Classifies the intent of the user utterance using a logistic regression model."""
@@ -264,13 +268,12 @@ class DialogState:
 
     def determine_next_state(self) -> str:
         """Determines the next state of the dialog based on the current state, filled slots and the intent of the current utterance."""
-
         # Always be able to exit
         if self.history_intents[-1] in ("bye", "thankyou"):
             if self.formal:
-                self.print_w_option(f"8. Goodbye and have a nice day!")
+                self.print_w_option("8. Goodbye and have a nice day!")
             else:
-                self.print_w_option(f"8. Ahoy landlubber!")
+                self.print_w_option("8. Ahoy landlubber!")
             exit()
 
         if self.history_states[-1] in ("1", "2", "3.1"):
@@ -342,9 +345,9 @@ class DialogState:
             # If the user wants to end the dialog, go to state 8
             if self.history_intents[-1] in ("bye", "thankyou"):
                 if self.formal:
-                    self.print_w_option(f"8. Goodbye and have a nice day!")
+                    self.print_w_option("8. Goodbye and have a nice day!")
                 else:
-                    self.print_w_option(f"8. Ahoy landlubber!")
+                    self.print_w_option("8. Ahoy landlubber!")
 
         if self.history_states[-1] == "5" and self.history_intents[-1] == "reqalts":
             # In state 5 (self.restaurants is not empty), so user can loop through the findings.
@@ -357,8 +360,7 @@ class DialogState:
         return "undefined"  # This should never happen
 
     def filter_based_on_preferences(self) -> str:
-        """Filters a list of restaurants based on the user's preferences (touristic, romantic,
-        and child-friendliness).
+        """Filters a list of restaurants based on the user's preferences (touristic, romantic, and child-friendliness).
 
         Returns
             - A query string with the filtered restaurants
@@ -434,6 +436,9 @@ class DialogState:
         return res_word, res_dist, res_cat
 
     def print_w_option(self, input_utterance: str):
+        """Prints the input utterance and applies the configurability options to it.
+
+        This function can be extended to apply more configurability options."""
         if self.output_in_caps:
             print(input_utterance.upper())
         else:

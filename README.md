@@ -62,7 +62,10 @@ Install the following for the correct linter and formatter:
 
 ```bash
 pip install autopep8 flake8 flake8-import-order flake8-blind-except flake8-builtins flake8-docstrings flake8-rst-docstrings flake8-logging-format
+python -m flake8
 ```
+
+Flake8 automatically uses the arguments provided in the `tox.ini` file to check coding style.
 
 ## Limitations
 

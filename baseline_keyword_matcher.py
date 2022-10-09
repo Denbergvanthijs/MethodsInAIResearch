@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv('./data/dialog_acts.dat', header=None, sep='\s\s+', engine='python')
+df = pd.read_csv("./data/dialog_acts.dat", header=None, sep="\s\s+", engine="python")
 
 # Split intent from utterances, rename column
 df['intent'] = df[0].str.split(" ", 1).str[0]
@@ -17,14 +17,14 @@ keys = [['kay', 'okay', 'okay ah', 'okay um', 'okay uh', 'im good', 'fine', 'oka
         ['i dont', 'wrong', 'no i dont', 'not any more', 'no not', 'can you change', 'dont want', 'not'],
         ['hi', 'hello', 'hey', 'howdy', 'hello welcome'],
         ['i dont care', 'any', 'dont care', 'south', 'east', 'west', 'north', 'moderate', 'food', 'im looking for', 'priced', 'any',
-            'expensive', 'restaurant', 'part of town', 'i need a', 'doesnt matter', 'price range', 'i need', 'looking for', 'cheap', 'is okay'],
+        'expensive', 'restaurant', 'part of town', 'i need a', 'doesnt matter', 'price range', 'i need', 'looking for', 'cheap', 'is okay'],
         ['no im sorry', 'no', 'no id like', 'no dont care', 'no im looking for'],
         ['child', 'worthless system', 'noise', 'sil', 'unintelligible', 'cough'],
         ['repeat', 'repeat that', 'go back', 'back', 'again please', 'try this again', 'cant repeat'],
         ['is there anything else', 'anything else', 'how about', 'what about'],
         ['more'],
         ['phone number', 'address', 'whats the adress', 'what is the address', 'what is the phone number',
-            'whats the phone number', 'post code', 'price range', 'type of', 'area'],
+        'whats the phone number', 'post code', 'price range', 'type of', 'area'],
         ['start over', 'reset', 'restart', 'start again'],
         ['thank you good bye', 'thank you goodbye', 'thank you', 'good bye']]
 
@@ -89,10 +89,11 @@ for w in utt:
             count += 1
     z += 1
 print("This many counted correctly:", count)
-print("Accuracy = ", count/len(utt))
+print("Accuracy = ", count / len(utt))
 
 
 def userprompt():
+    """Prompt user for input."""
     w = input("Type new sentence here: ")
     if any(i in w for i in named["ack"]):
         print("ack")

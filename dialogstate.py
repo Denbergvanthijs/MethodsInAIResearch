@@ -49,6 +49,7 @@ class DialogState:
                      "lebanese", "persian", "mediterranean", "bistro", "spanish", "indonesian", "world", "swedish")
         self.pricerange = ("cheap", "moderate", "expensive")
         self.dontcare = ("any", "doesnt matter", "dont care", "dontcare")
+        self.yes = ("yes", "y", "yeah", "sure", "agree", "absolutely", "aye", "certainly", "ok", "yep", "yup")
 
         # Maps states to dictionairy keys
         self.state_to_slot = {"2": "area", "3": "food", "4": "pricerange",
@@ -254,17 +255,7 @@ class DialogState:
         slot_preference = self.state_to_slot.get(self.history_states[-1])
 
         # If the user affirms the preference, set the slot to "yes"
-        if self.history_intents[-1] == "affirm":
-            self.slots_preferences[slot_preference] = True
-            return  # Early return
-
-        # Backup, if the intent is not "affirm"
-        for word in user_utterance.split():
-            if word in ("y", "yes"):
-                self.slots_preferences[slot_preference] = True
-                return  # Early return
-
-        self.slots_preferences[slot_preference] = False
+        self.slots_preferences[slot_preference] = self.determine_yes_or_no(user_utterance)
 
     def determine_next_state(self) -> str:
         """Determines the next state of the dialog based on the current state, filled slots and the intent of the current utterance."""
@@ -317,25 +308,25 @@ class DialogState:
                 return "5"
 
         if self.history_states[-1] == "10":
-            if self.history_intents[-1] == "affirm":
-                # drop the preferences
+            if self.determine_yes_or_no(self.history_utterances[-1]):
+                # Drop the preferences
                 self.slots_preferences = {"preference": None, "touristic": None, "romantic": None, "child": None}
                 if not self.lookup():
                     return "11"
                 else:
                     return "5"
-            elif self.history_intents[-1] in ("negate", "deny"):
+            else:
                 return "6"
 
         if self.history_states[-1] == "11":
-            if self.history_intents[-1] == "affirm":
+            if self.determine_yes_or_no(self.history_utterances[-1]):
                 self.slots["pricerange"] = None
                 self.slots["area"] = None
                 if not self.lookup():
                     return "6"
                 else:
                     return "5"
-            elif self.history_intents[-1] in ("negate", "deny"):
+            else:
                 return "6"
 
         if self.history_states[-1] in ("5", "6", "7"):
@@ -434,6 +425,22 @@ class DialogState:
                     res_cat = category_name
 
         return res_word, res_dist, res_cat
+
+    def determine_yes_or_no(self, user_utterance: str) -> str:
+        """Determines whether the user's utterance is a yes or no."""
+        # Main checks on intent
+        if self.history_intents[-1] == "affirm":
+            return True
+        elif self.history_intents[-1] in ("negate", "deny"):
+            return False
+
+        # Backup checks based on user utterance
+        for word in self.yes:
+            if word in user_utterance:
+                return True
+
+        # If no yes word is found, then it is a no
+        return False
 
     def print_w_option(self, input_utterance: str):
         """Prints the input utterance and applies the configurability options to it.

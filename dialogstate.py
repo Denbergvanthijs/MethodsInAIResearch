@@ -16,14 +16,15 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 
 try:
-    # For Mac machines, uncomment these 7 lines below to bypass SSL checking for NLTK
+    # For Mac machines, bypass SSL checking for NLTK
     _create_unverified_https_context = ssl._create_unverified_context
 except AttributeError:
     pass
 else:
     ssl._create_default_https_context = _create_unverified_https_context
-nltk.download('punkt')
-nltk.download("stopwords")
+finally:
+    nltk.download("punkt")
+    nltk.download("stopwords")
 
 
 class DialogState:
@@ -58,6 +59,7 @@ class DialogState:
 
         self.configurability = configurability
         self.formal = self.configurability.get("formal") == 'True'
+        self.output_in_caps = self.configurability.get("output_in_caps") == 'True'
 
         # Save the model to a pickle file to speedup the loading process
         if not os.path.exists(fp_pickle):
@@ -112,7 +114,7 @@ class DialogState:
 
     def execute_state(self) -> None:
         """Runs the current state of the dialog."""
-        delay_time = float(self.configurability.get('delay', 0)) / 1000
+        delay_time = float(self.configurability.get("delay", 0)) / 1000
 
         if delay_time > 0:
             self.print_w_option(f"Please wait ...")
@@ -254,7 +256,7 @@ class DialogState:
 
         # Backup, if the intent is not "affirm"
         for word in user_utterance.split():
-            if word in ('y', 'yes'):
+            if word in ("y", "yes"):
                 self.slots_preferences[slot_preference] = True
                 return  # Early return
 
@@ -406,7 +408,7 @@ class DialogState:
 
         if self.slots_preferences["preference"]:
             query_text += self.filter_based_on_preferences()
-        print(query_text)
+
         df_output = self.restaurant_info.query(query_text)
 
         recommendations = df_output["restaurantname"].values.tolist()
@@ -432,7 +434,7 @@ class DialogState:
         return res_word, res_dist, res_cat
 
     def print_w_option(self, input_utterance: str):
-        if self.formal:
+        if self.output_in_caps:
             print(input_utterance.upper())
         else:
             print(input_utterance)
@@ -442,14 +444,10 @@ if __name__ == "__main__":
     configurability = dotenv_values(".env")
 
     dialog_state = DialogState(configurability=configurability)
-    dialog_state.act("I'm looking for a cheap brimish food in the north of town")
+    dialog_state.act("I'm looking for cheap brimish food in the north of town")
     dialog_state.act("I'm looking for a restaurant in the center")
     dialog_state.act("Yes, I would like to provide some preferences")
     dialog_state.act("Yes please!")
     dialog_state.act("No, it is not")
     dialog_state.act("Nope")
     dialog_state.act("Thank you!")
-
-    # dialog_state = DialogState(configurability=configurability)
-    # while True:
-    #     dialog_state.act()

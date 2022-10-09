@@ -19,12 +19,18 @@ x_vectors = [doc.vector for doc in docs]
 
 # Split training:testing data by 85:15 ratio
 
-x_train, x_test, y_train, y_test = train_test_split(x_vectors, y_data, test_size=0.15)
+x_train, x_test, y_train, y_test = train_test_split(x_vectors, y_data, test_size=0.15, random_state=42)
 
 # Train and test model
 
 model = LinearSVC()
 model.fit(x_train, y_train)
-predictions = model.predict(x_test)
-score = accuracy_score(y_test, predictions)
-print("ACCURACY SCORE:", score)
+
+predictions_test = model.predict(x_test)
+predictions_train = model.predict(x_train)
+
+score_train = accuracy_score(y_train, predictions_train)
+print("ACCURACY SCORE TRAIN:", score_train)
+
+score_test = accuracy_score(y_test, predictions_test)
+print("ACCURACY SCORE TEST:", score_test)

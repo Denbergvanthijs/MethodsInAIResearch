@@ -99,7 +99,7 @@ class DialogState:
 
         if self.history_states[-1] in ("9", "9.1", "9.2", "9.3"):
             self.fill_slots_preferences(user_utterance_processed)
-        else:
+        elif self.history_states[-1] in ("1", "2", "3", "3.1", "4"):
             self.fill_slots(user_utterance_processed)
 
         next_state = self.determine_next_state()
@@ -158,7 +158,7 @@ class DialogState:
         elif self.history_states[-1] == "9.1":
             self.print_w_option("9.1. Would you like a touristic place?")
         elif self.history_states[-1] == "9.2":
-            self.print_w_option("9.2. Is it for a romantic occassion?")
+            self.print_w_option("9.2. Is it for a romantic occasion?")
         elif self.history_states[-1] == "9.3":
             self.print_w_option("9.3. Does the place have to be child-friendly?")
 
@@ -193,6 +193,14 @@ class DialogState:
             else:
                 self.print_w_option(f"8. Ahoy landlubber!")
             exit()
+
+        elif self.history_states[-1] == "10":
+            self.print_w_option(f"10. Sorry, I cannot find a place that matches your criteria."
+                                f" Would you like to try searching without the additional preferences?")
+
+        elif self.history_states[-1] == "11":
+            self.print_w_option(f"11. Sorry, I cannot find a place that matches your criteria"
+                                f" Would you like me to try broadening your search?")
 
     def classify_intent(self, user_utterance: str) -> str:
         """Classifies the intent of the user utterance using a logistic regression model."""
@@ -281,7 +289,7 @@ class DialogState:
         if self.history_states[-1] in ("1", "2", "3.1", "3", "4"):
             # If no restaurant in DB matches the user's preferences, go to state 6
             if not self.lookup():
-                return "6"
+                return "11"
             else:
                 return "9"
 
@@ -301,9 +309,31 @@ class DialogState:
 
         if self.history_states[-1] in ("9.3"):
             if not self.lookup():
-                return "6"
+                return "10"
             else:
                 return "5"
+
+        if self.history_states[-1] == "10":
+            if self.history_intents[-1] == "affirm":
+                # drop the preferences
+                self.slots_preferences = {"preference": None, "touristic": None, "romantic": None, "child": None}
+                if not self.lookup():
+                    return "11"
+                else:
+                    return "5"
+            elif self.history_intents[-1] in ("negate", "deny"):
+                return "6"
+
+        if self.history_states[-1] == "11":
+            if self.history_intents[-1] == "affirm":
+                self.slots["pricerange"] = None
+                self.slots["area"] = None
+                if not self.lookup():
+                    return "6"
+                else:
+                    return "5"
+            elif self.history_intents[-1] in ("negate", "deny"):
+                return "6"
 
         if self.history_states[-1] in ("5", "6", "7"):
             # If the user wants to know more about the restaurant, go to state 7

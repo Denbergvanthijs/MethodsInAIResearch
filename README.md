@@ -32,8 +32,10 @@ To add random antecedents to the `restaurant_info.csv` file, run the `add_column
 
 ## Configurability
 
-The system currently supports four configurability options:
+The system currently supports five configurability options:
 
+- Printing the output in all-caps
+    `output_in_caps=False` (True or False)
 - Ask user about correctness of match for Levenshtein results
     `max_lev_distance=3` (integer 1 or higher)
 - Insert artificial errors in preference extraction

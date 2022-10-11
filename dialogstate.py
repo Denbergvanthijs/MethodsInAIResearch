@@ -135,7 +135,7 @@ class DialogState:
             if self.formal:
                 self.print_w_option("2. What part of town do you have in mind? Choose from {north, south, east, west, centre}.")
             else:
-                self.print_w_option("2. Look at your compass landlubber, be it pointing north, south, east or west?")
+                self.print_w_option("2. Look at your compass landlubber, be it pointing north, south, east, west or centre?")
 
         elif self.history_states[-1] == "3":
             if self.formal:
@@ -156,6 +156,7 @@ class DialogState:
                 self.print_w_option("4.  Would you like the restaurant to be in the cheap, moderate, or expensive price range?")
             else:
                 self.print_w_option("4.  I hope ye got some doubloons, pick a cheap, moderate or expensive tavern.",)
+
         elif self.history_states[-1] == "9":
             self.print_w_option("9. Do you have additional requirements? Yes or no?")
         elif self.history_states[-1] == "9.1":

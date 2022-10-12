@@ -34,7 +34,7 @@ To add random antecedents to the `restaurant_info.csv` file, run the `add_column
 
 The system currently supports five configurability options:
 
-- Printing the output in all-caps
+- Printing the system utterances in all-caps
     `output_in_caps=False` (True or False)
 - Ask user about correctness of match for Levenshtein results
     `max_lev_distance=3` (integer 1 or higher)
@@ -44,6 +44,8 @@ The system currently supports five configurability options:
     `formal=False` (True or False)
 - Introduce a delay before showing system responses
     `delay=0` (in milliseconds)
+- Enable or disable printing of system information such as the current intent and state
+    `print_info=False` (True or False)
 
 These options can be altered in the `.env` file in the root of this repository.
 

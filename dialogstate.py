@@ -23,8 +23,8 @@ except AttributeError:
 else:
     ssl._create_default_https_context = _create_unverified_https_context
 finally:
-    nltk.download("punkt")
-    nltk.download("stopwords")
+    nltk.download("punkt", quiet=True)
+    nltk.download("stopwords", quiet=True)
 
 
 class DialogState:
@@ -63,6 +63,7 @@ class DialogState:
         self.configurability = configurability
         self.formal = self.configurability.get("formal") == 'True'
         self.output_in_caps = self.configurability.get("output_in_caps") == 'True'
+        self.print_info = self.configurability.get("print_info") == 'True'
 
         # Save the model to a pickle file to speedup the loading process
         if not os.path.exists(fp_pickle):
@@ -107,7 +108,9 @@ class DialogState:
 
         next_state = self.determine_next_state()
         self.history_states.append(next_state)
-        print(f"{current_intent=}; {next_state=}; slots={self.slots}; slots_preferences={self.slots_preferences}")
+
+        if self.print_info:
+            self.print_w_option(f"{current_intent=}; {next_state=}; slots={self.slots}; slots_preferences={self.slots_preferences}")
 
     def preprocessing(self, user_utterance: str):
         """Preprocesses the user utterance by tokenizing and removing stopwords."""
@@ -125,7 +128,7 @@ class DialogState:
 
         if self.history_states[-1] == "1":
             if self.formal:
-                self.print_w_option("1.  Welcome to the UU restaurant system!"
+                self.print_w_option("1.  Welcome to the UU restaurant system! "
                                     "You can ask for restaurants by area, price range or food type. How may I help you?")
             else:
                 self.print_w_option("1. Yarr matey, I be recommending you the best taverns! Tell me your price range, area, "

@@ -158,13 +158,25 @@ class DialogState:
                 self.print_w_option("4.  I hope ye got some doubloons, pick a cheap, moderate or expensive tavern.",)
 
         elif self.history_states[-1] == "9":
-            self.print_w_option("9. Do you have additional requirements? Yes or no?")
+            if self.formal:
+                self.print_w_option("9. Do you have additional requirements? Yes or no?")
+            else:
+                self.print_w_option("9. Do you have additional requirements? Yes or no?")  # TODO: change to piratespeak
         elif self.history_states[-1] == "9.1":
-            self.print_w_option("9.1. Would you like a touristic place?")
+            if self.formal:
+                self.print_w_option("9.1. Would you like a touristic place?")
+            else:
+                self.print_w_option("9.1. Would you like a touristic place?")  # TODO: change to piratespeak
         elif self.history_states[-1] == "9.2":
-            self.print_w_option("9.2. Is it for a romantic occasion?")
+            if self.formal:
+                self.print_w_option("9.2. Is it for a romantic occasion?")
+            else:
+                self.print_w_option("9.2. Is it for a romantic occasion?")  # TODO: change to piratespeak
         elif self.history_states[-1] == "9.3":
-            self.print_w_option("9.3. Does the place have to be child-friendly?")
+            if self.formal:
+                self.print_w_option("9.3. Does the place have to be child-friendly?")
+            else:
+                self.print_w_option("9.3. Does the place have to be child-friendly?")  # TODO: change to piratespeak
 
         elif self.history_states[-1] == "5":
             self.restaurant_chosen = next(self.restaurants)  # if not isinstance(self.restaurants, type(None)) else None
@@ -201,12 +213,20 @@ class DialogState:
             exit()
 
         elif self.history_states[-1] == "10":
-            self.print_w_option("10. Sorry, I cannot find a place that matches your criteria."
-                                " Would you like to try searching without the additional preferences?")
+            if self.formal:
+                self.print_w_option("10. Sorry, I cannot find a place that matches your criteria."
+                                    " Would you like to try searching without the additional preferences?")
+            else:
+                self.print_w_option("10. Sorry, I cannot find a place that matches your criteria."
+                                    " Would you like to try searching without the additional preferences?")   # TODO: change to piratespeak
 
         elif self.history_states[-1] == "11":
-            self.print_w_option("11. Sorry, I cannot find a place that matches your criteria"
-                                " Would you like me to try broadening your search?")
+            if self.formal:
+                self.print_w_option("11. Sorry, I cannot find a place that matches your criteria"
+                                    " Would you like me to try broadening your search?")
+            else:
+                self.print_w_option("11. Sorry, I cannot find a place that matches your criteria"
+                                    " Would you like me to try broadening your search?")   # TODO: change to piratespeak
 
     def classify_intent(self, user_utterance: str) -> str:
         """Classifies the intent of the user utterance using a logistic regression model."""
@@ -382,14 +402,15 @@ class DialogState:
         """Creates a reasoning sentence based on the user's preferences."""
         reasonstr = ''
 
-        if self.slots_preferences['touristic']:  # touristic
-            reasonstr += f"{', and' if len(reasonstr) > 0 else ''} it serves quality food with affordable price"
-        if self.slots_preferences['romantic']:  # romantic
+        # TODO: Add piratespeak
+        if self.slots_preferences["touristic"]:  # touristic
+            reasonstr += f" it serves quality food with affordable price"
+        if self.slots_preferences["romantic"]:  # romantic
             reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the restaurant is not too crowded and suitable for long stay"
-        if self.slots_preferences['child']:  # child-friendly
+        if self.slots_preferences["child"]:  # child-friendly
             reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the place is good for a short visit"
 
-        reasonstr = 'Reasoning: The restaurant matches your preference because' + reasonstr
+        reasonstr = "Reasoning: The restaurant matches your preference because" + reasonstr
         return f"{reasonstr}."
 
     def lookup(self) -> List[str]:

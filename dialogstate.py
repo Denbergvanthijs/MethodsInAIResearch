@@ -165,22 +165,22 @@ class DialogState:
             if self.formal:
                 self.print_w_option("9. Do you have additional requirements? Yes or no?")
             else:
-                self.print_w_option("9. Do you have additional requirements? Yes or no?")  # TODO: change to piratespeak
+                self.print_w_option("9. Are ye sailing, or do ye have additional wishes? Yes or no")
         elif self.history_states[-1] == "9.1":
             if self.formal:
                 self.print_w_option("9.1. Would you like a touristic place?")
             else:
-                self.print_w_option("9.1. Would you like a touristic place?")  # TODO: change to piratespeak
+                self.print_w_option("9.1. Ye like yerself a touristic tavern?") 
         elif self.history_states[-1] == "9.2":
             if self.formal:
                 self.print_w_option("9.2. Is it for a romantic occasion?")
             else:
-                self.print_w_option("9.2. Is it for a romantic occasion?")  # TODO: change to piratespeak
+                self.print_w_option("9.2. Ye want it romantic, landlubber? Yes or no")
         elif self.history_states[-1] == "9.3":
             if self.formal:
                 self.print_w_option("9.3. Does the place have to be child-friendly?")
             else:
-                self.print_w_option("9.3. Does the place have to be child-friendly?")  # TODO: change to piratespeak
+                self.print_w_option("9.3. Do the tavern be for young lads? Or old salts like me. Yes or no.")
 
         elif self.history_states[-1] == "5":
             self.restaurant_chosen = next(self.restaurants)  # if not isinstance(self.restaurants, type(None)) else None
@@ -218,19 +218,19 @@ class DialogState:
 
         elif self.history_states[-1] == "10":
             if self.formal:
-                self.print_w_option("10. Sorry, I cannot find a place that matches your criteria."
-                                    " Would you like to try searching without the additional preferences?")
+                self.print_w_option("10. I'm sorry, no restaurants found with your current preferences."
+                                    " Would you want me to look without the additional preferences?")
             else:
-                self.print_w_option("10. Sorry, I cannot find a place that matches your criteria."
-                                    " Would you like to try searching without the additional preferences?")   # TODO: change to piratespeak
+                self.print_w_option("10. Shiver me timbers! No good taverns found."
+                                    " Ye want to try lookin with no of those additional preferences?")
 
         elif self.history_states[-1] == "11":
             if self.formal:
-                self.print_w_option("11. Sorry, I cannot find a place that matches your criteria"
-                                    " Would you like me to try broadening your search?")
+                self.print_w_option("11. I'm sorry, no restaurants found with your current preferences."
+                                    " Would you want me to try expanding your search?")
             else:
-                self.print_w_option("11. Sorry, I cannot find a place that matches your criteria"
-                                    " Would you like me to try broadening your search?")   # TODO: change to piratespeak
+                self.print_w_option("11. Shiver me timbers! No good taverns found."
+                                    " Ye want me to try expanding yer search for ya?")
 
     def classify_intent(self, user_utterance: str) -> str:
         """Classifies the intent of the user utterance using a logistic regression model."""
@@ -408,13 +408,25 @@ class DialogState:
 
         # TODO: Add piratespeak
         if self.slots_preferences["touristic"]:  # touristic
-            reasonstr += f" it serves quality food with affordable price"
+            if self.formal:
+                reasonstr += f" it serves quality food with affordable price"
+            else:
+                reasonstr += f' it be servin grog and the catch of the day for few doubloons'
         if self.slots_preferences["romantic"]:  # romantic
-            reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the restaurant is not too crowded and suitable for long stay"
+            if self.formal:
+                reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the restaurant is not too crowded and suitable for long stay"
+            else: 
+                reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the tavern no be full of scallywags, and ripe for plunder"
         if self.slots_preferences["child"]:  # child-friendly
-            reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the place is good for a short visit"
+            if self.formal:
+                reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the place is good for a short visit"
+            else:
+                reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the tavern be good for a quick loot"
 
-        reasonstr = "Reasoning: The restaurant matches your preference because" + reasonstr
+        if self.formal:
+            reasonstr = "Reasoning: The restaurant matches your preference because" + reasonstr
+        else:
+            reasonstr = "Reasoning: The tavern be matching yer wishes because" + reasonstr
         return f"{reasonstr}."
 
     def lookup(self) -> List[str]:

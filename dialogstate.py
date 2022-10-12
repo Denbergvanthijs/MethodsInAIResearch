@@ -64,6 +64,7 @@ class DialogState:
         self.formal = self.configurability.get("formal") == 'True'
         self.output_in_caps = self.configurability.get("output_in_caps") == 'True'
         self.print_info = self.configurability.get("print_info") == 'True'
+        self.coloured_output = self.configurability.get("coloured_output") == 'True'
 
         # Save the model to a pickle file to speedup the loading process
         if not os.path.exists(fp_pickle):
@@ -93,7 +94,7 @@ class DialogState:
         if user_utterance is None:  # Ask the user for an utterance via CLI
             user_utterance = input("User: ")
         else:
-            print(user_utterance)  # We only print the user utterance if the user is not asked for an input
+            print(f"User: {user_utterance}")  # We only print the user utterance if the user is not asked for an input
 
         user_utterance_processed = self.preprocessing(user_utterance)
         self.history_utterances.append(user_utterance_processed)
@@ -472,9 +473,12 @@ class DialogState:
 
         This function can be extended to apply more configurability options."""
         if self.output_in_caps:
-            print(input_utterance.upper())
-        else:
-            print(input_utterance)
+            input_utterance = input_utterance.upper()
+
+        if self.coloured_output:
+            input_utterance = f"\033[1;32;40m{input_utterance}\033[0m"
+
+        print(input_utterance)
 
 
 if __name__ == "__main__":

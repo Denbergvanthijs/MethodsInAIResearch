@@ -46,6 +46,8 @@ The system currently supports five configurability options:
     `delay=0` (in milliseconds)
 - Enable or disable printing of system information such as the current intent and state
     `print_info=False` (True or False)
+- Whether the system utterances have a coloured output or not
+    `coloured_output=True` (True or False)
 
 These options can be altered in the `.env` file in the root of this repository.
 

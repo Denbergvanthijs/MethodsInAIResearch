@@ -170,7 +170,7 @@ class DialogState:
             if self.formal:
                 self.print_w_option("9.1. Would you like a touristic place?")
             else:
-                self.print_w_option("9.1. Ye like yerself a touristic tavern?") 
+                self.print_w_option("9.1. Ye like yerself a touristic tavern?")
         elif self.history_states[-1] == "9.2":
             if self.formal:
                 self.print_w_option("9.2. Is it for a romantic occasion?")
@@ -192,7 +192,7 @@ class DialogState:
                 self.print_w_option(f"5. {self.restaurant_chosen} is a jolly tavern in the {self.slots.get('area')}, "
                                     f"it be a {self.slots.get('pricerange')} tavern serving {self.slots.get('food')} loot.")
             if self.slots_preferences["preference"]:
-                self.print_w_option(self.create_reasoning_sentence())  # TODO: implement informal for reasoning sentence
+                self.print_w_option(self.create_reasoning_sentence())
 
         elif self.history_states[-1] == "6":
             if self.formal:
@@ -383,7 +383,7 @@ class DialogState:
         """
         insert_errors = self.configurability.get('insert_errors') == 'True'
 
-        query_text = ''
+        query_text = ""
         if self.slots_preferences['touristic']:  # touristic
             if insert_errors:  # intentional mistake
                 query_text += " and (pricerange == 'expensive' or (pricerange == 'cheap' and foodquality == 'acceptable'))"
@@ -404,18 +404,17 @@ class DialogState:
 
     def create_reasoning_sentence(self):
         """Creates a reasoning sentence based on the user's preferences."""
-        reasonstr = ''
+        reasonstr = ""
 
-        # TODO: Add piratespeak
         if self.slots_preferences["touristic"]:  # touristic
             if self.formal:
-                reasonstr += f" it serves quality food with affordable price"
+                reasonstr += " it serves quality food with affordable price"
             else:
-                reasonstr += f' it be servin grog and the catch of the day for few doubloons'
+                reasonstr += " it be servin grog and the catch of the day for few doubloons"
         if self.slots_preferences["romantic"]:  # romantic
             if self.formal:
                 reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the restaurant is not too crowded and suitable for long stay"
-            else: 
+            else:
                 reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the tavern no be full of scallywags, and ripe for plunder"
         if self.slots_preferences["child"]:  # child-friendly
             if self.formal:

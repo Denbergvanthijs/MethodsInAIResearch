@@ -113,6 +113,8 @@ class DialogState:
         else:
             print(f"User: {user_utterance}")  # We only print the user utterance if the user is not asked for an input
 
+        logging.log(logging.USER, user_utterance)  # Log the user utterance
+
         user_utterance_processed = self.preprocessing(user_utterance)
         self.history_utterances.append(user_utterance_processed)
 
@@ -127,8 +129,10 @@ class DialogState:
         next_state = self.determine_next_state()
         self.history_states.append(next_state)
 
+        current_state_info = f"{current_intent=} | {next_state=} | slots={self.slots}; slots_preferences={self.slots_preferences}"
+        logging.log(logging.SYSTEM, current_state_info)  # Log the current state information
         if self.print_info:
-            self.print_w_option(f"{current_intent=}; {next_state=}; slots={self.slots}; slots_preferences={self.slots_preferences}")
+            self.print_w_option(current_state_info)
 
     def preprocessing(self, user_utterance: str):
         """Preprocesses the user utterance by tokenizing and removing stopwords."""
@@ -502,6 +506,8 @@ class DialogState:
         This function can be extended to apply more configurability options."""
         if self.output_in_caps:
             input_utterance = input_utterance.upper()
+
+        logging.log(logging.SYSTEM, input_utterance)  # Log the system utterance before adding coloured text
 
         if self.coloured_output:
             input_utterance = f"\033[1;32;40m{input_utterance}\033[0m"

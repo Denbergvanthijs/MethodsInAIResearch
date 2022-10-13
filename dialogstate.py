@@ -1,8 +1,10 @@
+import logging
 import os
 import pickle
 import random
 import ssl
 import time
+from datetime import datetime
 from itertools import cycle
 from typing import List
 
@@ -31,6 +33,27 @@ class DialogState:
     def __init__(self, fp_restaurant_info: str = "./data/restaurant_data.csv", fp_dialog_acts: str = "./data/dialog_acts.dat",
                  fp_pickle: str = "./data/logreg.pkl", configurability: dict = {}) -> None:
         """Initializes the Dialog State Manager."""
+        # Load the configuration of the current experiment
+        self.configurability = configurability
+        self.formal = self.configurability.get("formal") == 'True'
+        self.output_in_caps = self.configurability.get("output_in_caps") == 'True'
+        self.print_info = self.configurability.get("print_info") == 'True'
+        self.coloured_output = self.configurability.get("coloured_output") == 'True'
+
+        # Setup for logging
+        log_dir = os.path.join(os.getcwd(), "logs")
+        if not os.path.exists(log_dir):  # Create the log directory if it does not exist
+            os.makedirs(log_dir)
+
+        now = datetime.now().strftime("%Y_%M_%d-%I_%M_%S")
+        logging.basicConfig(filename=os.path.join(log_dir, f"{now}_{self.formal}.log"),
+                            filemode="w", format="%(asctime)s | %(levelname)s | %(message)s", level=logging.DEBUG)
+        logging.addLevelName(logging.DEBUG + 5, "USER")  # Add a new logging level for user utterances
+        logging.addLevelName(logging.DEBUG + 6, "SYSTEM")  # Add a new logging level for system utterances
+        logging.USER = logging.DEBUG + 5
+        logging.SYSTEM = logging.DEBUG + 6
+        logging.log(logging.SYSTEM, dict(self.configurability))  # Convert OrderedDict to dict for pretty printing
+
         self.history_utterances = []
         self.history_states = ["1"]  # Start with state 1
         self.history_intents = [None]  # Start with no intent for state 1
@@ -59,12 +82,6 @@ class DialogState:
         self.restaurants = None  # List of restaurants that match the current slots
 
         self.stopwords = stopwords.words("english")
-
-        self.configurability = configurability
-        self.formal = self.configurability.get("formal") == 'True'
-        self.output_in_caps = self.configurability.get("output_in_caps") == 'True'
-        self.print_info = self.configurability.get("print_info") == 'True'
-        self.coloured_output = self.configurability.get("coloured_output") == 'True'
 
         # Save the model to a pickle file to speedup the loading process
         if not os.path.exists(fp_pickle):

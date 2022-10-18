@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import pickle
@@ -46,13 +47,16 @@ class DialogState:
             os.makedirs(log_dir)
 
         now = datetime.now().strftime("%Y_%M_%d-%I_%M_%S")
-        logging.basicConfig(filename=os.path.join(log_dir, f"{now}_{self.formal}.log"),
+        logging.basicConfig(filename=os.path.join(log_dir, f"{now}.log"),
                             filemode="w", format="%(asctime)s | %(levelname)s | %(message)s", level=logging.DEBUG)
         logging.addLevelName(logging.DEBUG + 5, "USER")  # Add a new logging level for user utterances
         logging.addLevelName(logging.DEBUG + 6, "SYSTEM")  # Add a new logging level for system utterances
         logging.USER = logging.DEBUG + 5
         logging.SYSTEM = logging.DEBUG + 6
-        logging.log(logging.SYSTEM, dict(self.configurability))  # Convert OrderedDict to dict for pretty printing
+
+        # Save the configuration of the current experiment
+        with open(os.path.join(log_dir, f"{now}.json"), "w") as file:
+            json.dump(configurability, file, indent=4, sort_keys=True)
 
         self.history_utterances = []
         self.history_states = ["1"]  # Start with state 1

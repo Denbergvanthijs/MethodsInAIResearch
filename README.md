@@ -4,7 +4,7 @@
 
 This project consists of the following baseline systems for intent detection:
 
-- A baseline system that, regardless of the content of the utterance, always assigns the majority class of in the data. (`baseline_majority.py`)
+- A baseline system that, regardless of the content of the utterance, always assigns the majority class of the data. (`baseline_majority.py`)
 - A baseline rule-based system based on keyword matching. (`baseline_keyword_matcher.py`)
 
 As well as three different machine learning classifiers for intent detection:
@@ -36,7 +36,7 @@ The system currently supports five configurability options:
 
 - Printing the system utterances in all-caps
     `output_in_caps=False` (True or False)
-- Ask user about correctness of match for Levenshtein results
+- Maximum Levenshtein distance for filling in the slots
     `max_lev_distance=3` (integer 1 or higher)
 - Insert artificial errors in preference extraction
     `insert_errors=False` (True or False)
@@ -49,7 +49,22 @@ The system currently supports five configurability options:
 - Whether the system utterances have a coloured output or not
     `coloured_output=True` (True or False)
 
-These options can be altered in the `.env` file in the root of this repository.
+These options can be altered in the `.env` file at the root of this repository.
+
+---
+
+The following parameters are used for the data analysis of the experiments and do not affect the system's behaviour:
+
+- The name of the researcher conducting the experiment
+    `researcher_name="Albert"` (any from: {"Albert", "Lisa", "Ruben", "Thijs"})
+- The age of the participant
+    `participant_age=18`  (integer, 18 and higher)
+- The educational level of the participant
+    `participant_edu="U"`  (U for University, H for HBO, M for MBO, L for Lower)
+- The participant's native language
+    `participant_mother_tongue="Dutch"` (any from: {"Dutch", "English", "Other"})
+- The participant's occupation
+    `participant_occupation="Student"` (any from: {"Student", "Working", "Unemployed", "Stay-At-Home", "Other"})
 
 ## Installation
 
@@ -71,7 +86,7 @@ pip install autopep8 flake8 flake8-import-order flake8-blind-except flake8-built
 python -m flake8
 ```
 
-Flake8 automatically uses the arguments provided in the `tox.ini` file to check coding style.
+Flake8 automatically uses the arguments provided in the `tox.ini` file to check the coding style.
 
 ## Limitations
 

@@ -59,12 +59,6 @@ The following parameters are used for the data analysis of the experiments and d
     `researcher_name="Albert"` (any from: {"Albert", "Lisa", "Ruben", "Thijs"})
 - The age of the participant
     `participant_age=18`  (integer, 18 and higher)
-- The educational level of the participant
-    `participant_edu="U"`  (U for University, H for HBO, M for MBO, L for Lower)
-- The participant's native language
-    `participant_mother_tongue="Dutch"` (any from: {"Dutch", "English", "Other"})
-- The participant's occupation
-    `participant_occupation="Student"` (any from: {"Student", "Working", "Unemployed", "Stay-At-Home", "Other"})
 
 ## Installation
 

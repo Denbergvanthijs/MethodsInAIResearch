@@ -435,7 +435,7 @@ class DialogState:
             if self.formal:
                 reasonstr += " it serves quality food with affordable price"
             else:
-                reasonstr += " it be servin grog and the catch of the day for few doubloons"
+                reasonstr += " it be servin the catch of the day for few doubloons"
         if self.slots_preferences["romantic"]:  # romantic
             if self.formal:
                 reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the restaurant is not too crowded and suitable for long stay"

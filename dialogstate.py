@@ -190,7 +190,7 @@ class DialogState:
             if self.formal:
                 self.print_w_option("9. Do you have additional requirements? Yes or no?")
             else:
-                self.print_w_option("9. Are ye sailing, or do ye have additional wishes? Yes or no")
+                self.print_w_option("9. Do ye have additional wishes? Yes or no")
         elif self.history_states[-1] == "9.1":
             if self.formal:
                 self.print_w_option("9.1. Would you like a touristic place?")
@@ -205,7 +205,7 @@ class DialogState:
             if self.formal:
                 self.print_w_option("9.3. Does the place have to be child-friendly?")
             else:
-                self.print_w_option("9.3. Do the tavern be for young lads? Or old salts like me. Yes or no.")
+                self.print_w_option("9.3. Do the tavern be for young lads (yes)? Or old salts like me (no).")
 
         elif self.history_states[-1] == "5":
             self.restaurant_chosen = next(self.restaurants)  # if not isinstance(self.restaurants, type(None)) else None

@@ -1,11 +1,8 @@
-import json
-import logging
 import os
 import pickle
 import random
 import ssl
 import time
-from datetime import datetime
 from itertools import cycle
 from typing import List
 
@@ -34,30 +31,6 @@ class DialogState:
     def __init__(self, fp_restaurant_info: str = "./data/restaurant_data.csv", fp_dialog_acts: str = "./data/dialog_acts.dat",
                  fp_pickle: str = "./data/logreg.pkl", configurability: dict = {}) -> None:
         """Initializes the Dialog State Manager."""
-        # Load the configuration of the current experiment
-        self.configurability = configurability
-        self.formal = self.configurability.get("formal") == 'True'
-        self.output_in_caps = self.configurability.get("output_in_caps") == 'True'
-        self.print_info = self.configurability.get("print_info") == 'True'
-        self.coloured_output = self.configurability.get("coloured_output") == 'True'
-
-        # Setup for logging
-        log_dir = os.path.join(os.getcwd(), "logs")
-        if not os.path.exists(log_dir):  # Create the log directory if it does not exist
-            os.makedirs(log_dir)
-
-        now = datetime.now().strftime("%Y_%M_%d-%I_%M_%S")
-        logging.basicConfig(filename=os.path.join(log_dir, f"{now}.log"),
-                            filemode="w", format="%(asctime)s | %(levelname)s | %(message)s", level=logging.DEBUG)
-        logging.addLevelName(logging.DEBUG + 5, "USER")  # Add a new logging level for user utterances
-        logging.addLevelName(logging.DEBUG + 6, "SYSTEM")  # Add a new logging level for system utterances
-        logging.USER = logging.DEBUG + 5
-        logging.SYSTEM = logging.DEBUG + 6
-
-        # Save the configuration of the current experiment
-        with open(os.path.join(log_dir, f"{now}.json"), "w") as file:
-            json.dump(configurability, file, indent=4, sort_keys=True)
-
         self.history_utterances = []
         self.history_states = ["1"]  # Start with state 1
         self.history_intents = [None]  # Start with no intent for state 1
@@ -86,6 +59,12 @@ class DialogState:
         self.restaurants = None  # List of restaurants that match the current slots
 
         self.stopwords = stopwords.words("english")
+
+        self.configurability = configurability
+        self.formal = self.configurability.get("formal") == 'True'
+        self.output_in_caps = self.configurability.get("output_in_caps") == 'True'
+        self.print_info = self.configurability.get("print_info") == 'True'
+        self.coloured_output = self.configurability.get("coloured_output") == 'True'
 
         # Save the model to a pickle file to speedup the loading process
         if not os.path.exists(fp_pickle):
@@ -117,8 +96,6 @@ class DialogState:
         else:
             print(f"User: {user_utterance}")  # We only print the user utterance if the user is not asked for an input
 
-        logging.log(logging.USER, user_utterance)  # Log the user utterance
-
         user_utterance_processed = self.preprocessing(user_utterance)
         self.history_utterances.append(user_utterance_processed)
 
@@ -133,10 +110,8 @@ class DialogState:
         next_state = self.determine_next_state()
         self.history_states.append(next_state)
 
-        current_state_info = f"{current_intent=} | {next_state=} | slots={self.slots}; slots_preferences={self.slots_preferences}"
-        logging.log(logging.SYSTEM, current_state_info)  # Log the current state information
         if self.print_info:
-            self.print_w_option(current_state_info)
+            self.print_w_option(f"{current_intent=}; {next_state=}; slots={self.slots}; slots_preferences={self.slots_preferences}")
 
     def preprocessing(self, user_utterance: str):
         """Preprocesses the user utterance by tokenizing and removing stopwords."""
@@ -190,12 +165,12 @@ class DialogState:
             if self.formal:
                 self.print_w_option("9. Do you have additional requirements? Yes or no?")
             else:
-                self.print_w_option("9. Are ye sailing, or do ye have additional wishes? Yes or no")
+                self.print_w_option("9. Do ye have additional wishes? Yes or no")
         elif self.history_states[-1] == "9.1":
             if self.formal:
                 self.print_w_option("9.1. Would you like a touristic place?")
             else:
-                self.print_w_option("9.1. Ye like yerself a touristic tavern?")
+                self.print_w_option("9.1. Ye like yerself a touristic tavern?") 
         elif self.history_states[-1] == "9.2":
             if self.formal:
                 self.print_w_option("9.2. Is it for a romantic occasion?")
@@ -205,7 +180,7 @@ class DialogState:
             if self.formal:
                 self.print_w_option("9.3. Does the place have to be child-friendly?")
             else:
-                self.print_w_option("9.3. Do the tavern be for young lads? Or old salts like me. Yes or no.")
+                self.print_w_option("9.3. Do the tavern be for young lads (yes)? Or old salts like me (no).")
 
         elif self.history_states[-1] == "5":
             self.restaurant_chosen = next(self.restaurants)  # if not isinstance(self.restaurants, type(None)) else None
@@ -217,7 +192,7 @@ class DialogState:
                 self.print_w_option(f"5. {self.restaurant_chosen} is a jolly tavern in the {self.slots.get('area')}, "
                                     f"it be a {self.slots.get('pricerange')} tavern serving {self.slots.get('food')} loot.")
             if self.slots_preferences["preference"]:
-                self.print_w_option(self.create_reasoning_sentence())
+                self.print_w_option(self.create_reasoning_sentence())  # TODO: implement informal for reasoning sentence
 
         elif self.history_states[-1] == "6":
             if self.formal:
@@ -408,7 +383,7 @@ class DialogState:
         """
         insert_errors = self.configurability.get('insert_errors') == 'True'
 
-        query_text = ""
+        query_text = ''
         if self.slots_preferences['touristic']:  # touristic
             if insert_errors:  # intentional mistake
                 query_text += " and (pricerange == 'expensive' or (pricerange == 'cheap' and foodquality == 'acceptable'))"
@@ -429,17 +404,18 @@ class DialogState:
 
     def create_reasoning_sentence(self):
         """Creates a reasoning sentence based on the user's preferences."""
-        reasonstr = ""
+        reasonstr = ''
 
+        # TODO: Add piratespeak
         if self.slots_preferences["touristic"]:  # touristic
             if self.formal:
-                reasonstr += " it serves quality food with affordable price"
+                reasonstr += f" it serves quality food with affordable price"
             else:
-                reasonstr += " it be servin grog and the catch of the day for few doubloons"
+                reasonstr += f' it be servin the catch of the day for few doubloons'
         if self.slots_preferences["romantic"]:  # romantic
             if self.formal:
                 reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the restaurant is not too crowded and suitable for long stay"
-            else:
+            else: 
                 reasonstr += f"{', and' if len(reasonstr) > 0 else ''} the tavern no be full of scallywags, and ripe for plunder"
         if self.slots_preferences["child"]:  # child-friendly
             if self.formal:
@@ -510,8 +486,6 @@ class DialogState:
         This function can be extended to apply more configurability options."""
         if self.output_in_caps:
             input_utterance = input_utterance.upper()
-
-        logging.log(logging.SYSTEM, input_utterance)  # Log the system utterance before adding coloured text
 
         if self.coloured_output:
             input_utterance = f"\033[1;32;40m{input_utterance}\033[0m"

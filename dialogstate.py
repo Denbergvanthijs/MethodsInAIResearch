@@ -521,12 +521,20 @@ class DialogState:
 
 if __name__ == "__main__":
     configurability = dotenv_values(".env")
-
     dialog_state = DialogState(configurability=configurability)
-    dialog_state.act("I'm looking for cheap brimish food in the north of town")
-    dialog_state.act("I'm looking for a restaurant in the center")
+
+    # Task 1: Find a cheap British restaurant in the center that is child friendly, touristic, but not romantic.
+    # dialog_state.act("I'm looking for cheap brimish food in the center of town")
+    # dialog_state.act("Yes, I would like to provide some preferences")
+    # dialog_state.act("Yes please!")  # Touristic
+    # dialog_state.act("No, it is not")  # Romantic
+    # dialog_state.act("Yes!")  # Child-friendly
+    # dialog_state.act("Thank you!")
+
+    # Task 2: Find a moderately priced Indian restaurant in the north of town that is child friendly, not romantic and is not touristic.
+    dialog_state.act("I'm looking for moderate Indian food in the north of town")
     dialog_state.act("Yes, I would like to provide some preferences")
-    dialog_state.act("Yes please!")  # Touristic
+    dialog_state.act("Nope")  # Touristic
     dialog_state.act("No, it is not")  # Romantic
-    dialog_state.act("Nope")  # Child-friendly
+    dialog_state.act("Yes!")  # Child-friendly
     dialog_state.act("Thank you!")

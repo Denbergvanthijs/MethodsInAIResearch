@@ -222,7 +222,7 @@ class DialogState:
         elif self.history_states[-1] == "6":
             if self.formal:
                 self.print_w_option(f"6. I'm sorry but there is no {self.slots.get('pricerange')} place "
-                                    f"serving {self.slots.get('food')} cuisine in the {self.slots.get('area')}."
+                                    f"serving {self.slots.get('food')} cuisine in the {self.slots.get('area')}. "
                                     "What else can I help you with?")
             else:
                 self.print_w_option(f"6. Sink me, but there no be a {self.slots.get('pricerange')} tavern "
@@ -526,7 +526,7 @@ if __name__ == "__main__":
     dialog_state.act("I'm looking for cheap brimish food in the north of town")
     dialog_state.act("I'm looking for a restaurant in the center")
     dialog_state.act("Yes, I would like to provide some preferences")
-    dialog_state.act("Yes please!")
-    dialog_state.act("No, it is not")
-    dialog_state.act("Nope")
+    dialog_state.act("Yes please!")  # Touristic
+    dialog_state.act("No, it is not")  # Romantic
+    dialog_state.act("Nope")  # Child-friendly
     dialog_state.act("Thank you!")

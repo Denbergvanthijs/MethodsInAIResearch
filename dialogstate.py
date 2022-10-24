@@ -46,7 +46,7 @@ class DialogState:
         if not os.path.exists(log_dir):  # Create the log directory if it does not exist
             os.makedirs(log_dir)
 
-        now = datetime.now().strftime("%Y_%M_%d-%I_%M_%S")
+        now = datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
         logging.basicConfig(filename=os.path.join(log_dir, f"{now}.log"),
                             filemode="w", format="%(asctime)s | %(levelname)s | %(message)s", level=logging.DEBUG)
         logging.addLevelName(logging.DEBUG + 5, "USER")  # Add a new logging level for user utterances
